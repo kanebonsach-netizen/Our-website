@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cove Studio — Diseño Web y Marketing Digital en Mallorca</title>
+  <meta name="description" content="Webs de alto impacto y marketing para marcas ambiciosas. Basados en Mallorca, trabajamos en todo el mundo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: transparent;
+      color: #0f0f0f;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── WebGL shader canvas ── */
+    #shader-bg {
+      position: fixed;
+      inset: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    ul { list-style: none; }
+
+    :root {
+      --teal:       #2E8F8F;
+      --teal-light: #3DAAAA;
+      --navy:       #1B2B45;
+      --black:      #0f0f0f;
+      --gray:       #6b6b6b;
+      --gray-light: #a8a49e;
+      --border:     #e2ddd7;
+      --bg:         rgba(247, 244, 239, 0.88);
+      --bg-soft:    rgba(237, 233, 226, 0.88);
+      --bg-solid:   #F7F4EF;
+    }
+
+    /* Sections that must stay fully opaque */
+    .mobile-menu     { background: #F7F4EF !important; }
+    .pricing-card.popular { background: #0f0f0f !important; }
+
+    /* ── Global grain overlay ── */
+    @keyframes grain-shift {
+      0%   { transform: translate(0,0); }
+      20%  { transform: translate(-3%,5%); }
+      40%  { transform: translate(4%,-3%); }
+      60%  { transform: translate(-5%,2%); }
+      80%  { transform: translate(3%,4%); }
+      100% { transform: translate(0,0); }
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: -50%;
+      width: 200%; height: 200%;
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0.038;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 220px 220px;
+      animation: grain-shift 7s steps(10) infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body::after { animation: none; }
+    }
+
+    /* ── Photo grain mixin ── */
+    .grain { position: relative; overflow: hidden; }
+    .grain::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+      opacity: 0.22;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      animation: grain-shift 5s steps(8) infinite;
+      z-index: 2;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .grain::after { animation: none; }
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 1160px; margin-inline: auto; padding-inline: 32px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0;
+      transition: background 0.35s, border-color 0.35s;
+      border-bottom: 1px solid transparent;
+    }
+    nav.light {
+      background: rgba(247,244,239,0.92);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-color: var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 15px; font-weight: 700;
+      letter-spacing: -0.02em;
+      color: white;
+      transition: color 0.3s;
+    }
+    nav.light .nav-logo { color: var(--black); }
+    .nav-logo img { height: 30px; width: 30px; object-fit: contain; }
+    .nav-links {
+      display: flex; align-items: center; gap: 36px;
+      position: absolute; left: 50%; transform: translateX(-50%);
+    }
+    .nav-links a {
+      font-size: 14px; font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      transition: color 0.2s;
+    }
+    nav.light .nav-links a { color: var(--gray); }
+    .nav-links a:hover { color: white; }
+    nav.light .nav-links a:hover { color: var(--black); }
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .nav-social {
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      transition: color 0.2s;
+    }
+    nav.light .nav-social { color: var(--gray); }
+    .nav-social:hover { color: white; }
+    nav.light .nav-social:hover { color: var(--black); }
+    .btn-nav {
+      font-size: 13px; font-weight: 600;
+      color: var(--black); background: white;
+      padding: 9px 18px; border-radius: 8px;
+      transition: opacity 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+    nav.light .btn-nav { background: var(--black); color: white; }
+    .btn-nav:hover { opacity: 0.82; transform: translateY(-1px); }
+    .hamburger {
+      display: none; flex-direction: column; gap: 4px; padding: 6px; cursor: pointer;
+    }
+    .hamburger span {
+      display: block; width: 20px; height: 1.5px;
+      background: white; border-radius: 2px;
+      transition: background 0.3s;
+    }
+    nav.light .hamburger span { background: var(--black); }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none; position: fixed; inset: 0;
+      background: var(--bg); z-index: 99;
+      flex-direction: column;
+      padding: 96px 32px 48px; gap: 0;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 28px; font-weight: 700;
+      color: var(--black); letter-spacing: -0.03em;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .mobile-cta {
+      margin-top: 32px; font-size: 16px; font-weight: 600;
+      background: var(--black); color: white;
+      padding: 14px 24px; border-radius: 10px; text-align: center;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex; align-items: flex-end;
+      padding-bottom: 80px;
+      overflow: hidden;
+    }
+    .hero-photo {
+      position: absolute; inset: 0;
+    }
+    .hero-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      filter: contrast(1.1) saturate(0.75);
+      display: block;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        170deg,
+        rgba(14,22,36,0.80) 0%,
+        rgba(17,28,46,0.62) 55%,
+        rgba(14,22,36,0.85) 100%
+      );
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative; z-index: 3;
+      padding-top: 160px;
+      width: 100%;
+    }
+    .hero-meta {
+      display: flex; align-items: center;
+      flex-wrap: wrap; gap: 24px;
+      margin-bottom: 36px;
+    }
+    .hero-meta-item {
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.55);
+    }
+    .hero-meta-item::before {
+      content: '+ ';
+      color: var(--teal-light);
+      font-weight: 700;
+    }
+    .hero-h1 {
+      font-size: clamp(38px, 5.8vw, 74px);
+      font-weight: 800; line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: white;
+      max-width: 880px;
+      margin-bottom: 28px;
+    }
+    .hero-sub {
+      font-size: clamp(15px, 1.6vw, 18px);
+      font-weight: 400; color: rgba(255,255,255,0.58);
+      max-width: 520px; line-height: 1.65;
+      margin-bottom: 44px;
+    }
+    .hero-actions {
+      display: flex; align-items: center;
+      gap: 20px; flex-wrap: wrap;
+    }
+    .btn-hero-primary {
+      font-size: 15px; font-weight: 600;
+      color: var(--black); background: white;
+      padding: 13px 28px; border-radius: 10px;
+      transition: opacity 0.2s, transform 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero-primary:hover { opacity: 0.88; transform: translateY(-2px); }
+    .btn-hero-secondary {
+      font-size: 15px; font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      padding: 13px 0;
+      transition: color 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-hero-secondary:hover { color: white; }
+    .btn-hero-secondary svg { transition: transform 0.2s; }
+    .btn-hero-secondary:hover svg { transform: translateX(3px); }
+    .hero-scroll {
+      position: absolute; bottom: 36px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+      z-index: 3;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+      animation: scroll-line 2s ease-in-out infinite;
+    }
+    @keyframes scroll-line {
+      0%, 100% { opacity: 1; transform: scaleY(1); }
+      50% { opacity: 0.4; transform: scaleY(0.6); }
+    }
+
+    /* ── SECTION COMMON ── */
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gray-light); margin-bottom: 48px;
+    }
+
+    /* ── WORKS ── */
+    #works {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .works-header {
+      display: flex; align-items: flex-end;
+      justify-content: space-between; margin-bottom: 64px;
+    }
+    .works-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800; letter-spacing: -0.03em;
+    }
+    .works-link {
+      font-size: 14px; font-weight: 600; color: var(--teal);
+      display: flex; align-items: center; gap: 5px;
+      transition: opacity 0.2s;
+    }
+    .works-link:hover { opacity: 0.7; }
+    .work-item {
+      display: grid;
+      grid-template-columns: 200px 1fr 260px;
+      gap: 40px;
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      align-items: start;
+    }
+    .work-item:last-child { border-bottom: 1px solid var(--border); }
+    .work-item:hover .work-thumb img { transform: scale(1.05); }
+    .work-meta { padding-top: 4px; }
+    .work-num {
+      font-size: 12px; font-weight: 600;
+      color: var(--gray-light); letter-spacing: 0.06em; margin-bottom: 12px;
+    }
+    .work-title {
+      font-size: 20px; font-weight: 700;
+      letter-spacing: -0.02em; margin-bottom: 14px;
+    }
+    .work-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .work-tag {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.04em; color: var(--teal);
+      background: rgba(46,143,143,0.08);
+      padding: 4px 10px; border-radius: 100px;
+      border: 1px solid rgba(46,143,143,0.18);
+    }
+    .work-right { display: flex; flex-direction: column; gap: 14px; padding-top: 4px; }
+    .work-desc { font-size: 15px; line-height: 1.7; color: var(--gray); }
+    .work-link {
+      font-size: 13px; font-weight: 600; color: var(--black);
+      display: inline-flex; align-items: center; gap: 5px;
+      transition: gap 0.2s; width: fit-content;
+    }
+    .work-link:hover { gap: 9px; }
+    .work-thumb {
+      aspect-ratio: 4/3;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .work-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: contrast(1.06) saturate(0.8);
+      transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+      display: block;
+    }
+
+    /* ── FULL-WIDTH PHOTO BREAK ── */
+    .photo-break {
+      height: 500px;
+      position: relative;
+      overflow: hidden;
+    }
+    .photo-break img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 40%;
+      filter: contrast(1.08) saturate(0.78);
+      display: block;
+    }
+    .photo-break-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(14,22,36,0.3) 0%,
+        rgba(14,22,36,0.1) 40%,
+        rgba(14,22,36,0.5) 100%
+      );
+      z-index: 1;
+    }
+    .photo-break-caption {
+      position: absolute; bottom: 40px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      text-align: center;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+
+    /* ── CTA STRIP ── */
+    #cta-strip {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      background: var(--bg);
+    }
+    .cta-strip-h2 {
+      font-size: clamp(28px, 4.5vw, 54px);
+      font-weight: 800; letter-spacing: -0.04em;
+      line-height: 1.08; color: var(--black);
+      max-width: 740px; margin-inline: auto;
+      margin-bottom: 36px;
+    }
+    .btn-primary {
+      font-size: 15px; font-weight: 600;
+      color: white; background: var(--black);
+      padding: 13px 28px; border-radius: 10px;
+      transition: opacity 0.2s, transform 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { opacity: 0.82; transform: translateY(-2px); }
+
+    /* ── PROCESS ── */
+    #process {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .process-grid {
+      display: grid; grid-template-columns: 1fr 2fr;
+      gap: 80px; align-items: start;
+    }
+    .process-left { position: sticky; top: 88px; }
+    .process-title {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 800; letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .process-sub {
+      font-size: 15px; line-height: 1.65; color: var(--gray);
+    }
+    .faq-list { display: flex; flex-direction: column; }
+    .faq-item { border-top: 1px solid var(--border); padding: 28px 0; }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-q {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 16px;
+      cursor: pointer; user-select: none;
+    }
+    .faq-q-text {
+      font-size: 16px; font-weight: 600;
+      color: var(--black); letter-spacing: -0.01em;
+      line-height: 1.4;
+    }
+    .faq-toggle {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .faq-item.open .faq-toggle { background: var(--black); border-color: var(--black); }
+    .faq-toggle svg { transition: transform 0.3s; color: var(--black); }
+    .faq-item.open .faq-toggle svg { transform: rotate(45deg); color: white; }
+    .faq-a {
+      font-size: 15px; line-height: 1.7; color: var(--gray);
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s ease, padding-top 0.3s;
+    }
+    .faq-item.open .faq-a { max-height: 400px; padding-top: 16px; }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials {
+      padding: 96px 0; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .testimonials-header { margin-bottom: 56px; }
+    .testimonials-title {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 800; letter-spacing: -0.03em;
+    }
+    .marquee-wrap { overflow: hidden; }
+    .marquee-track {
+      display: flex; gap: 16px;
+      animation: marquee 40s linear infinite;
+      width: max-content;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
+    .testimonial-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+      min-width: 310px; max-width: 310px;
+      flex-shrink: 0;
+    }
+    .testimonial-quote {
+      font-size: 15px; line-height: 1.65;
+      color: var(--black); margin-bottom: 20px;
+    }
+    .testimonial-author { display: flex; align-items: center; gap: 10px; }
+    .testimonial-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--navy));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .testimonial-name { font-size: 13px; font-weight: 700; }
+    .testimonial-role { font-size: 12px; color: var(--gray-light); }
+
+    /* ── PRICING ── */
+    #pricing {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .pricing-header { margin-bottom: 64px; }
+    .pricing-title {
+      font-size: clamp(26px, 3.5vw, 42px);
+      font-weight: 800; letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+    .pricing-sub { font-size: 16px; color: var(--gray); max-width: 480px; line-height: 1.6; }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .pricing-card {
+      padding: 40px 34px;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+    .pricing-card:last-child { border-right: none; }
+    .pricing-card.popular { background: var(--black); }
+    .plan-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 16px;
+    }
+    .pricing-card.popular .plan-label { color: var(--teal-light); }
+    .popular-pill {
+      position: absolute; top: 16px; right: 16px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      background: var(--teal); color: white;
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .plan-price {
+      font-size: clamp(34px, 3.8vw, 50px);
+      font-weight: 800; letter-spacing: -0.04em;
+      color: var(--black); line-height: 1; margin-bottom: 6px;
+    }
+    .pricing-card.popular .plan-price { color: white; }
+    .plan-price sup { font-size: 0.42em; font-weight: 700; vertical-align: super; letter-spacing: 0; }
+    .plan-billing { font-size: 13px; color: var(--gray-light); margin-bottom: 8px; }
+    .pricing-card.popular .plan-billing { color: rgba(255,255,255,0.4); }
+    .plan-monthly {
+      font-size: 14px; font-weight: 600; color: var(--teal);
+      margin-bottom: 28px; padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-card.popular .plan-monthly { color: var(--teal-light); border-color: rgba(255,255,255,0.1); }
+    .plan-desc { font-size: 14px; line-height: 1.6; color: var(--gray); margin-bottom: 24px; }
+    .pricing-card.popular .plan-desc { color: rgba(255,255,255,0.55); }
+    .plan-features { flex: 1; display: flex; flex-direction: column; gap: 11px; margin-bottom: 32px; }
+    .plan-feature {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--black);
+    }
+    .pricing-card.popular .plan-feature { color: rgba(255,255,255,0.85); }
+    .check { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: var(--teal); }
+    .pricing-card.popular .check { color: var(--teal-light); }
+    .plan-btn {
+      width: 100%; padding: 13px; border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+      text-align: center; display: block; cursor: pointer;
+    }
+    .plan-btn:hover { opacity: 0.8; transform: translateY(-1px); }
+    .plan-btn-default {
+      background: var(--bg-soft); border: 1.5px solid var(--border);
+      color: var(--black);
+    }
+    .plan-btn-popular { background: var(--teal); color: white; border: none; }
+
+    /* ── TEAM ── */
+    #team {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .team-header { margin-bottom: 64px; }
+    .team-title {
+      font-size: clamp(26px, 3.5vw, 42px);
+      font-weight: 800; letter-spacing: -0.03em; margin-bottom: 12px;
+    }
+    .team-sub { font-size: 16px; color: var(--gray); max-width: 480px; line-height: 1.6; }
+    .team-grid {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+    }
+    .team-card {
+      padding: 36px 28px;
+      border-right: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .team-card:last-child { border-right: none; }
+    .team-card:hover { background: var(--bg-soft); }
+    .team-initials {
+      width: 52px; height: 52px; border-radius: 12px;
+      background: var(--bg-soft); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 800; color: var(--black);
+      letter-spacing: -0.01em; margin-bottom: 20px;
+    }
+    .team-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .team-role { font-size: 13px; color: var(--teal); font-weight: 600; }
+
+    /* ── ABOUT ── */
+    #about {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: start;
+    }
+    .about-left { position: sticky; top: 88px; }
+    .about-title {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 800; letter-spacing: -0.03em; margin-bottom: 28px;
+    }
+    .about-photo {
+      width: 100%; aspect-ratio: 3/4;
+      border-radius: 14px; overflow: hidden;
+    }
+    .about-photo img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: contrast(1.06) saturate(0.82);
+    }
+    .about-body { display: flex; flex-direction: column; gap: 20px; }
+    .about-body p { font-size: 16px; line-height: 1.75; color: var(--gray); }
+    .about-body strong { color: var(--black); font-weight: 600; }
+    .about-stats {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; margin-top: 12px;
+    }
+    .about-stat {
+      padding: 22px 18px;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .about-stat:last-child { border-right: none; }
+    .about-stat-num {
+      font-size: 26px; font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 4px;
+    }
+    .about-stat-label { font-size: 12px; color: var(--gray-light); font-weight: 500; }
+
+    /* ── RECOGNITION ── */
+    #recognition {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .recognition-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 80px; align-items: center; }
+    .recognition-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    .recognition-item {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .recognition-item:first-child { border-top: 1px solid var(--border); }
+    .recognition-name { font-size: 15px; font-weight: 600; }
+    .recognition-detail { font-size: 13px; color: var(--gray-light); }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .contact-title {
+      font-size: clamp(28px, 4vw, 46px);
+      font-weight: 800; letter-spacing: -0.04em;
+      line-height: 1.1; margin-bottom: 20px;
+    }
+    .contact-sub { font-size: 16px; line-height: 1.65; color: var(--gray); margin-bottom: 36px; }
+    .contact-info-list { display: flex; flex-direction: column; gap: 14px; }
+    .contact-info-row {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: var(--gray);
+    }
+    .contact-info-row svg { color: var(--teal); width: 15px; height: 15px; flex-shrink: 0; }
+    .contact-info-row a { transition: color 0.2s; }
+    .contact-info-row a:hover { color: var(--teal); }
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--gray);
+    }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; padding: 12px 14px;
+      background: var(--bg-soft);
+      border: 1.5px solid var(--border);
+      border-radius: 10px; font-family: inherit;
+      font-size: 14px; color: var(--black);
+      outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--teal); }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--gray-light); }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b6b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      background-color: var(--bg-soft);
+      cursor: pointer;
+    }
+    .form-select option { background: white; color: var(--black); }
+    .form-btn {
+      width: 100%; padding: 14px;
+      background: var(--black); color: white;
+      font-family: inherit; font-size: 15px; font-weight: 600;
+      border-radius: 10px; cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .form-btn:hover { opacity: 0.82; transform: translateY(-1px); }
+
+    /* ── FOOTER ── */
+    footer { padding: 48px 0 40px; background: var(--bg); }
+    .footer-top {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+      gap: 24px; flex-wrap: wrap;
+    }
+    .footer-logo {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 15px; font-weight: 700;
+      letter-spacing: -0.02em; color: var(--black);
+    }
+    .footer-logo img { height: 28px; width: 28px; object-fit: contain; }
+    .footer-nav { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .footer-nav a { font-size: 14px; font-weight: 500; color: var(--gray); transition: color 0.2s; }
+    .footer-nav a:hover { color: var(--black); }
+    .footer-socials { display: flex; align-items: center; gap: 20px; }
+    .footer-socials a { font-size: 14px; font-weight: 500; color: var(--gray); transition: color 0.2s; }
+    .footer-socials a:hover { color: var(--black); }
+    .footer-bottom {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding-top: 28px; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 13px; color: var(--gray-light); }
+    .footer-location {
+      font-size: 13px; color: var(--gray-light);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .footer-location svg { color: var(--teal); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 0.65s cubic-bezier(0.22,1,0.36,1), transform 0.65s cubic-bezier(0.22,1,0.36,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .d1 { transition-delay: 0.08s; }
+    .d2 { transition-delay: 0.16s; }
+    .d3 { transition-delay: 0.24s; }
+    .d4 { transition-delay: 0.32s; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .work-item { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .work-thumb { display: none; }
+      .process-grid { grid-template-columns: 1fr; gap: 48px; }
+      .process-left { position: static; }
+      .about-grid { grid-template-columns: 1fr; gap: 48px; }
+      .about-left { position: static; }
+      .recognition-grid { grid-template-columns: 1fr; gap: 32px; }
+      .contact-grid { grid-template-columns: 1fr; gap: 56px; }
+      .team-grid { grid-template-columns: repeat(2,1fr); }
+      .team-card:nth-child(2) { border-right: none; }
+      .team-card:nth-child(3) { border-top: 1px solid var(--border); }
+      .about-photo { aspect-ratio: 16/9; }
+    }
+    @media (max-width: 768px) {
+      .container { padding-inline: 20px; }
+      .nav-links, .nav-right { display: none; }
+      .hamburger { display: flex; }
+      .works-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .work-item { grid-template-columns: 1fr; gap: 16px; }
+      .pricing-grid { grid-template-columns: 1fr; border-radius: 12px; }
+      .pricing-card { border-right: none; border-bottom: 1px solid var(--border); }
+      .pricing-card:last-child { border-bottom: none; }
+      .pricing-card.popular { order: -1; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .about-stat:nth-child(2) { border-right: none; }
+      .about-stat:nth-child(3) { border-top: 1px solid var(--border); grid-column: span 2; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-top { flex-direction: column; align-items: flex-start; }
+      .photo-break { height: 320px; }
+    }
+    @media (max-width: 480px) {
+      .team-grid { grid-template-columns: 1fr; }
+      .team-card { border-right: none; border-bottom: 1px solid var(--border); }
+      .team-card:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- WebGL shader background -->
+  <canvas id="shader-bg" aria-hidden="true"></canvas>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button onclick="toggleMenu()" style="position:absolute;top:20px;right:20px;padding:8px;" aria-label="Cerrar menú">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <a href="#works" onclick="toggleMenu()">Trabajo</a>
+    <a href="#process" onclick="toggleMenu()">Proceso</a>
+    <a href="#pricing" onclick="toggleMenu()">Precios</a>
+    <a href="#team" onclick="toggleMenu()">Equipo</a>
+    <a href="#contact" onclick="toggleMenu()" class="mobile-cta">Empezar un proyecto</a>
+  </div>
+
+  <!-- Nav -->
+  <nav id="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo">
+        <img src="brand_assets/dummy-removebg-preview.png" alt="Cove Studio" />
+        <span>Cove Studio</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#works">Trabajo</a></li>
+        <li><a href="#process">Proceso</a></li>
+        <li><a href="#pricing">Precios</a></li>
+        <li><a href="#team">Equipo</a></li>
+        <li><a href="#about">Nosotros</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://instagram.com" class="nav-social" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://linkedin.com" class="nav-social" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="#contact" class="btn-nav">Empezar proyecto</a>
+      </div>
+      <button class="hamburger" onclick="toggleMenu()" id="hamburgerBtn" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-photo grain">
+      <img src="brand_assets/maik-hankemann-oogna46sCVo-unsplash.jpg" alt="Paraje natural de Mallorca" loading="eager" />
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <div class="hero-meta reveal">
+        <span class="hero-meta-item">Disponibles para nuevos proyectos</span>
+        <span class="hero-meta-item">Más de 50 empresas confían en nosotros</span>
+        <span class="hero-meta-item">Web, Branding, Marketing</span>
+      </div>
+      <h1 class="hero-h1 reveal d1">
+        Webs de alto impacto y marketing para marcas ambiciosas. Convierte más visitas, genera confianza y haz crecer tu negocio.
+      </h1>
+      <p class="hero-sub reveal d2">
+        Desde landing pages sencillas hasta estrategias digitales completas — cada decisión es intencionada y pensada para generar resultados a largo plazo.
+      </p>
+      <div class="hero-actions reveal d3">
+        <a href="#contact" class="btn-hero-primary">
+          Empezar un proyecto
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#works" class="btn-hero-secondary">
+          Ver nuestro trabajo
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="hero-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- WORKS -->
+  <section id="works">
+    <div class="container">
+      <div class="works-header">
+        <h2 class="works-title reveal">Proyectos Destacados</h2>
+        <a href="#contact" class="works-link reveal">
+          Empezar un proyecto
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="work-item reveal">
+        <div class="work-meta">
+          <div class="work-num">01</div>
+          <div class="work-title">Sol Boutique Hotel</div>
+          <div class="work-tags">
+            <span class="work-tag">Diseño Web</span>
+            <span class="work-tag">Desarrollo</span>
+            <span class="work-tag">Branding</span>
+          </div>
+        </div>
+        <div class="work-right">
+          <p class="work-desc">Rediseño completo de marca y web para un hotel boutique en Palma. Creamos una experiencia de reserva inmersiva que aumentó las reservas directas un 40%, reduciendo la dependencia de plataformas externas.</p>
+          <span class="work-link">Ver proyecto <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="work-thumb grain">
+          <img src="brand_assets/charlie-firth-HQJIQjXq1HI-unsplash.jpg" alt="Sol Boutique Hotel" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="work-item reveal">
+        <div class="work-meta">
+          <div class="work-num">02</div>
+          <div class="work-title">Mallorca Surf Co.</div>
+          <div class="work-tags">
+            <span class="work-tag">Diseño Web</span>
+            <span class="work-tag">SEO</span>
+            <span class="work-tag">Marketing</span>
+          </div>
+        </div>
+        <div class="work-right">
+          <p class="work-desc">Transformación digital completa para una escuela de surf local. Nueva identidad visual, web orientada a conversión y estrategia SEO que triplicó el tráfico orgánico en 6 meses.</p>
+          <span class="work-link">Ver proyecto <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="work-thumb grain">
+          <img src="brand_assets/anna-2s05UVy2Cwc-unsplash.jpg" alt="Mallorca Surf Co." loading="lazy" />
+        </div>
+      </div>
+
+      <div class="work-item reveal">
+        <div class="work-meta">
+          <div class="work-num">03</div>
+          <div class="work-title">Finca Aromàtics</div>
+          <div class="work-tags">
+            <span class="work-tag">Branding</span>
+            <span class="work-tag">Diseño Web</span>
+            <span class="work-tag">Desarrollo</span>
+          </div>
+        </div>
+        <div class="work-right">
+          <p class="work-desc">Identidad de marca y tienda online para una finca de hierbas aromáticas en el interior de Mallorca. Llevamos su historia al mundo digital con un lenguaje visual tan orgánico como sus productos.</p>
+          <span class="work-link">Ver proyecto <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="work-thumb grain">
+          <img src="brand_assets/id23-_gzPPnri-4Y-unsplash.jpg" alt="Finca Aromàtics" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="work-item reveal">
+        <div class="work-meta">
+          <div class="work-num">04</div>
+          <div class="work-title">Clínica Palma</div>
+          <div class="work-tags">
+            <span class="work-tag">Diseño Web</span>
+            <span class="work-tag">SEO</span>
+          </div>
+        </div>
+        <div class="work-right">
+          <p class="work-desc">Web centrada en la confianza para una clínica privada orientada a pacientes internacionales. Arquitectura de información clara, contenido multilingüe y sistema de reservas que redujo las consultas telefónicas en un 60%.</p>
+          <span class="work-link">Ver proyecto <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="work-thumb grain">
+          <img src="brand_assets/federico-di-dio-photography-7YFLAt7ceBE-unsplash.jpg" alt="Clínica Palma" loading="lazy" />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FULL-WIDTH PHOTO BREAK -->
+  <div class="photo-break grain" aria-hidden="true">
+    <img src="brand_assets/fabian-s-fpiiJxQ1YVc-unsplash.jpg" alt="Cap de Formentor, Mallorca" loading="lazy" />
+    <div class="photo-break-overlay"></div>
+    <p class="photo-break-caption">Cap de Formentor — Mallorca</p>
+  </div>
+
+  <!-- CTA STRIP -->
+  <section id="cta-strip">
+    <div class="container">
+      <p class="cta-strip-h2 reveal">
+        Desde primeros lanzamientos hasta marcas consolidadas, cada decisión es intencionada y pensada para el impacto a largo plazo.
+      </p>
+      <div style="display:flex;justify-content:center;" class="reveal d1">
+        <a href="#contact" class="btn-primary" style="font-size:16px;padding:15px 32px;">
+          Empezar un proyecto
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <div class="container">
+      <div class="process-grid">
+        <div class="process-left">
+          <div class="section-label reveal">Proceso</div>
+          <h2 class="process-title reveal d1">Cómo trabajamos</h2>
+          <p class="process-sub reveal d2">Simple, transparente y centrado en ti. Esto es lo que significa trabajar con Cove Studio.</p>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">
+              <span class="faq-q-text">¿Cómo es vuestro proceso desde el primer contacto hasta el lanzamiento?</span>
+              <div class="faq-toggle" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="faq-a">Empezamos con una llamada de descubrimiento para entender tu negocio, objetivos y audiencia. Luego entregamos una propuesta clara, esperamos tu aprobación y comenzamos con el diseño. Ves avances en tiempo real durante todo el proceso — sin sorpresas al final. La mayoría de proyectos tardan entre 2 y 4 semanas desde el inicio hasta el lanzamiento.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">
+              <span class="faq-q-text">¿Qué ocurre después de contactaros?</span>
+              <div class="faq-toggle" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="faq-a">Respondemos en menos de 24 horas. Tras un breve formulario de bienvenida, agendamos una llamada gratuita de 30 minutos para conocer tu proyecto. Sin compromiso — solo una conversación para ver si somos el equipo adecuado para ti.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">
+              <span class="faq-q-text">¿Lo hacéis todo vosotros sin subcontratar?</span>
+              <div class="faq-toggle" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="faq-a">Sí. Diseño, desarrollo, copywriting, SEO y estrategia de marketing — todo lo gestiona nuestro equipo de cuatro personas. Nunca subcontratamos tu proyecto. Siempre hablarás directamente con quien está haciendo el trabajo.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">
+              <span class="faq-q-text">¿Cuánto tiempo lleva un proyecto típico?</span>
+              <div class="faq-toggle" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="faq-a">Una landing page básica: 1-2 semanas. Un sitio profesional de varias páginas: 2-4 semanas. Proyectos completos con branding y estrategia de marketing: 4-8 semanas. Los plazos dependen en parte de la rapidez con que se proporcione feedback.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)" role="button" tabindex="0" aria-expanded="false">
+              <span class="faq-q-text">¿Qué incluye la cuota mensual de mantenimiento?</span>
+              <div class="faq-toggle" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+            <div class="faq-a">Hosting, actualizaciones de seguridad, monitorización del rendimiento y pequeños cambios de contenido. No tendrás que preocuparte por el aspecto técnico de tu web — nosotros lo gestionamos. El plan Full Access incluye además revisiones mensuales de estrategia y gestión de campañas de marketing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="container testimonials-header">
+      <div class="section-label reveal">Testimonios</div>
+      <h2 class="testimonials-title reveal d1">Lo que dicen nuestros clientes</h2>
+    </div>
+    <div class="marquee-wrap">
+      <div class="marquee-track" aria-label="Testimonios de clientes">
+        <div class="testimonial-card"><p class="testimonial-quote">"Cove Studio transformó completamente nuestra presencia online. En dos meses desde el lanzamiento, nuestras reservas directas se duplicaron. Se notó que de verdad les importaba el resultado."</p><div class="testimonial-author"><div class="testimonial-avatar">MR</div><div><div class="testimonial-name">Marta Rosselló</div><div class="testimonial-role">Propietaria, Sol Boutique Hotel</div></div></div></div>
+        <div class="testimonial-card"><p class="testimonial-quote">"Entendieron nuestra marca de inmediato. La web que nos hicieron es exactamente lo que imaginábamos pero nunca habríamos sabido describir. Rápidos, profesionales y un placer trabajar con ellos."</p><div class="testimonial-author"><div class="testimonial-avatar">JT</div><div><div class="testimonial-name">James Tanner</div><div class="testimonial-role">Fundador, Mallorca Surf Co.</div></div></div></div>
+        <div class="testimonial-card"><p class="testimonial-quote">"El equipo de Cove Studio es de lo mejor. Nuestro tráfico SEO se triplicó en 6 meses y la web es una pasada. Mereció cada euro invertido."</p><div class="testimonial-author"><div class="testimonial-avatar">AL</div><div><div class="testimonial-name">Ana López</div><div class="testimonial-role">Directora, Clínica Palma</div></div></div></div>
+        <div class="testimonial-card"><p class="testimonial-quote">"Teníamos un plazo muy ajustado y un briefing bastante vago. Cove Studio lo convirtió en una web preciosa y funcional en menos de dos semanas. Quedamos muy impresionados."</p><div class="testimonial-author"><div class="testimonial-avatar">PG</div><div><div class="testimonial-name">Pere Gomila</div><div class="testimonial-role">CEO, Finca Aromàtics</div></div></div></div>
+        <div class="testimonial-card"><p class="testimonial-quote">"Profesionales, atentos y con un talento enorme. Nuestra nueva web recibe elogios cada semana de los clientes. No iría a ningún otro sitio para trabajos de diseño web en Mallorca."</p><div class="testimonial-author"><div class="testimonial-avatar">SB</div><div><div class="testimonial-name">Sophie Bernhardt</div><div class="testimonial-role">Fundadora, Palma Architecture Studio</div></div></div></div>
+        <!-- duplicate set for seamless loop -->
+        <div class="testimonial-card"><p class="testimonial-quote">"Cove Studio transformó completamente nuestra presencia online. En dos meses desde el lanzamiento, nuestras reservas directas se duplicaron. Se notó que de verdad les importaba el resultado."</p><div class="testimonial-author"><div class="testimonial-avatar">MR</div><div><div class="testimonial-name">Marta Rosselló</div><div class="testimonial-role">Propietaria, Sol Boutique Hotel</div></div></div></div>
+        <div class="testimonial-card"><p class="testimonial-quote">"Entendieron nuestra marca de inmediato. La web que nos hicieron es exactamente lo que imaginábamos pero nunca habríamos sabido describir. Rápidos, profesionales y un placer trabajar con ellos."</p><div class="testimonial-author"><div class="testimonial-avatar">JT</div><div><div class="testimonial-name">James Tanner</div><div class="testimonial-role">Fundador, Mallorca Surf Co.</div></div></div></div>
+        <div class="testimonial-card"><p class="testimonial-quote">"El equipo de Cove Studio es de lo mejor. Nuestro tráfico SEO se triplicó en 6 meses y la web es una pasada. Mereció cada euro invertido."</p><div class="testimonial-author"><div class="testimonial-avatar">AL</div><div><div class="testimonial-name">Ana López</div><div class="testimonial-role">Directora, Clínica Palma</div></div></div></div>
+        <div class="testimonial-card"><p class="testimonial-quote">"Teníamos un plazo muy ajustado y un briefing bastante vago. Cove Studio lo convirtió en una web preciosa y funcional en menos de dos semanas. Quedamos muy impresionados."</p><div class="testimonial-author"><div class="testimonial-avatar">PG</div><div><div class="testimonial-name">Pere Gomila</div><div class="testimonial-role">CEO, Finca Aromàtics</div></div></div></div>
+        <div class="testimonial-card"><p class="testimonial-quote">"Profesionales, atentos y con un talento enorme. Nuestra nueva web recibe elogios cada semana de los clientes. No iría a ningún otro sitio para trabajos de diseño web en Mallorca."</p><div class="testimonial-author"><div class="testimonial-avatar">SB</div><div><div class="testimonial-name">Sophie Bernhardt</div><div class="testimonial-role">Fundadora, Palma Architecture Studio</div></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="container">
+      <div class="pricing-header">
+        <div class="section-label reveal">Precios</div>
+        <h2 class="pricing-title reveal d1">Precios transparentes, sin sorpresas.</h2>
+        <p class="pricing-sub reveal d2">Cada plan incluye una tarifa única de configuración y una cuota mensual de mantenimiento, soporte y hosting.</p>
+      </div>
+      <div class="pricing-grid reveal">
+        <div class="pricing-card">
+          <div class="plan-label">Básico</div>
+          <div class="plan-price"><sup>€</sup>299</div>
+          <div class="plan-billing">pago único de configuración</div>
+          <div class="plan-monthly">+ 29 € / mes</div>
+          <p class="plan-desc">Una landing page limpia y rápida para profesionales y pequeñas empresas que quieren estar online.</p>
+          <ul class="plan-features">
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Landing page de una página</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Diseño responsive para móvil</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Formulario de contacto</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Configuración SEO básica</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Informe mensual</li>
+          </ul>
+          <a href="#contact" class="plan-btn plan-btn-default">Empezar</a>
+        </div>
+        <div class="pricing-card popular">
+          <div class="popular-pill">Más popular</div>
+          <div class="plan-label">Profesional</div>
+          <div class="plan-price"><sup>€</sup>499</div>
+          <div class="plan-billing">pago único de configuración</div>
+          <div class="plan-monthly">+ 49 € / mes</div>
+          <p class="plan-desc">Una web detallada de varias páginas para negocios en crecimiento que quieren más presencia y más conversiones.</p>
+          <ul class="plan-features">
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Hasta 5 páginas</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Animaciones personalizadas</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Blog o galería</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>SEO avanzado + Analytics</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Soporte prioritario</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Actualizaciones de contenido mensuales</li>
+          </ul>
+          <a href="#contact" class="plan-btn plan-btn-popular">Empezar</a>
+        </div>
+        <div class="pricing-card">
+          <div class="plan-label">Full Access</div>
+          <div class="plan-price"><sup>€</sup>999</div>
+          <div class="plan-billing">pago único de configuración</div>
+          <div class="plan-monthly">+ 59 € / mes</div>
+          <p class="plan-desc">La experiencia completa de Cove Studio — web, marketing, branding y estrategia bajo un mismo techo.</p>
+          <ul class="plan-features">
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Páginas y revisiones ilimitadas</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Identidad de marca completa</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Campañas de marketing digital</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Estrategia SEO completa</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Gestor de cuenta dedicado</li>
+            <li class="plan-feature"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Llamadas de estrategia mensuales</li>
+          </ul>
+          <a href="#contact" class="plan-btn plan-btn-default">Empezar</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section id="team">
+    <div class="container">
+      <div class="team-header">
+        <div class="section-label reveal">Equipo</div>
+        <h2 class="team-title reveal d1">Las personas detrás del trabajo.</h2>
+        <p class="team-sub reveal d2">Cuatro especialistas en Mallorca. Sin subcontrataciones, sin intermediarios — solo las personas que hacen el trabajo.</p>
+      </div>
+      <div class="team-grid reveal">
+        <div class="team-card"><div class="team-initials">KB</div><div class="team-name">Kane Bonsach</div><div class="team-role">Marketing</div></div>
+        <div class="team-card"><div class="team-initials">FG</div><div class="team-name">Felix Gutierrez</div><div class="team-role">Agente de Ventas</div></div>
+        <div class="team-card"><div class="team-initials">SP</div><div class="team-name">Sergio Pina</div><div class="team-role">Desarrollador Web</div></div>
+        <div class="team-card"><div class="team-initials">JC</div><div class="team-name">Juan Castell</div><div class="team-role">Programador</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-left">
+          <div class="section-label reveal">Nosotros</div>
+          <h2 class="about-title reveal d1">Un equipo pequeño con un gran enfoque.</h2>
+          <div class="about-photo grain reveal d2">
+            <img src="brand_assets/joshua-humpfer-c0o1To5eb8M-unsplash.jpg" alt="Faro de Cap de Formentor al atardecer" loading="lazy" />
+          </div>
+        </div>
+        <div class="about-body">
+          <p class="reveal">Cove Studio nació de una convicción simple: <strong>cada negocio merece una web que realmente trabaje para él.</strong> No solo una web bonita, sino una que genere confianza, atraiga consultas y refleje la calidad de lo que ofrecen.</p>
+          <p class="reveal d1">Somos cuatro personas en Mallorca — un especialista en marketing, un estratega de ventas, un desarrollador web y un programador. Trabajamos juntos en cada proyecto, lo que significa que el pensamiento detrás de tu marca y el código que hace funcionar tu web están siempre alineados.</p>
+          <p class="reveal d2">Nos centramos exclusivamente en diseño web y marketing digital. No intentamos abarcarlo todo. Hacemos esto muy bien, para un número reducido de clientes a la vez, y tratamos cada proyecto como si fuera nuestro propio negocio el que está en juego.</p>
+          <div class="about-stats reveal d3">
+            <div class="about-stat"><div class="about-stat-num">50+</div><div class="about-stat-label">Proyectos entregados</div></div>
+            <div class="about-stat"><div class="about-stat-num">98%</div><div class="about-stat-label">Satisfacción de clientes</div></div>
+            <div class="about-stat"><div class="about-stat-num">2–4s</div><div class="about-stat-label">Semanas de media</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECOGNITION -->
+  <section id="recognition">
+    <div class="container">
+      <div class="recognition-grid">
+        <div>
+          <div class="section-label reveal">Reconocimientos</div>
+          <h2 class="recognition-title reveal d1">Prensa y menciones</h2>
+        </div>
+        <div class="recognition-list reveal">
+          <div class="recognition-item"><span class="recognition-name">Mallorca Daily Bulletin</span><span class="recognition-detail">Mejor Agencia Digital, 2025</span></div>
+          <div class="recognition-item"><span class="recognition-name">Awwwards</span><span class="recognition-detail">Mención de Honor</span></div>
+          <div class="recognition-item"><span class="recognition-name">PIMEM — Pymes de Mallorca</span><span class="recognition-detail">Agencia Colaboradora</span></div>
+          <div class="recognition-item"><span class="recognition-name">Landbook</span><span class="recognition-detail">Web Destacada ×3</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-grid">
+        <div>
+          <div class="section-label reveal">Contacto</div>
+          <h2 class="contact-title reveal d1">Empieza un proyecto con nosotros.</h2>
+          <p class="contact-sub reveal d2">Cuéntanos tu proyecto y te respondemos en menos de 24 horas. Sin compromiso, sin presión — solo una conversación.</p>
+          <div class="contact-info-list reveal d3">
+            <div class="contact-info-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Mallorca, España
+            </div>
+            <div class="contact-info-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <a href="mailto:infocovestudio1@gmail.com">infocovestudio1@gmail.com</a>
+            </div>
+            <div class="contact-info-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.58 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.78a16 16 0 0 0 6 6l1.14-1.14a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.72 16z"/></svg>
+              <a href="tel:+34611485423">+34 611 485 423</a>
+            </div>
+            <div class="contact-info-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Respuesta en menos de 24 horas
+            </div>
+          </div>
+        </div>
+        <form class="contact-form reveal" onsubmit="handleSubmit(event)" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="c-name">Nombre</label>
+              <input class="form-input" type="text" id="c-name" name="name" placeholder="Tu nombre" autocomplete="name" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="c-email">Email</label>
+              <input class="form-input" type="email" id="c-email" name="email" placeholder="tu@empresa.com" autocomplete="email" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-plan">Plan de interés</label>
+            <select class="form-select" id="c-plan" name="plan">
+              <option value="">Selecciona un plan...</option>
+              <option value="basic">Básico — 299 € + 29 €/mes</option>
+              <option value="professional">Profesional — 499 € + 49 €/mes</option>
+              <option value="full">Full Access — 999 € + 59 €/mes</option>
+              <option value="unsure">Aún no lo sé</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-message">Cuéntanos tu proyecto</label>
+            <textarea class="form-textarea" id="c-message" name="message" placeholder="¿Qué necesitas? ¿Cuál es tu plazo? Cualquier detalle nos ayuda..."></textarea>
+          </div>
+          <button type="submit" class="form-btn" id="submitBtn">Enviar mensaje</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <a href="#" class="footer-logo">
+          <img src="brand_assets/dummy-removebg-preview.png" alt="Cove Studio" />
+          <span>Cove Studio</span>
+        </a>
+        <nav class="footer-nav" aria-label="Navegación del pie de página">
+          <a href="#works">Trabajo</a>
+          <a href="#process">Proceso</a>
+          <a href="#pricing">Precios</a>
+          <a href="#team">Equipo</a>
+          <a href="#about">Nosotros</a>
+          <a href="#contact">Contacto</a>
+        </nav>
+        <div class="footer-socials">
+          <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="mailto:infocovestudio1@gmail.com">Email</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 Cove Studio. Todos los derechos reservados.</p>
+        <p class="footer-location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Mallorca, España
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('light', window.scrollY > 80);
+    }, { passive: true });
+
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const btn  = document.getElementById('hamburgerBtn');
+      const open = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    function toggleFaq(el) {
+      const item   = el.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        el.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFaq(q); }
+      });
+    });
+
+    const reveals = document.querySelectorAll('.reveal');
+    const ro = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -28px 0px' });
+    reveals.forEach(el => ro.observe(el));
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = 'Mensaje enviado ✓';
+      btn.style.background = '#1a6e1a';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = 'Enviar mensaje';
+        btn.style.background = '';
+        btn.disabled = false;
+        e.target.reset();
+      }, 4000);
+    }
+
+    /* ── WebGL shader background ── */
+    (function () {
+      var canvas = document.getElementById('shader-bg');
+      var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) { document.body.style.background = '#F7F4EF'; return; }
+
+      function resize() {
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width  = window.innerWidth  * dpr;
+        canvas.height = window.innerHeight * dpr;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+      resize();
+      window.addEventListener('resize', resize, { passive: true });
+
+      /* Flat vertex shader — all animation in fragment */
+      var vsrc = [
+        'attribute vec2 aPos;',
+        'attribute vec2 aUv;',
+        'varying vec2 vUv;',
+        'void main(){vUv=aUv;gl_Position=vec4(aPos,0.0,1.0);}'
+      ].join('\n');
+
+      /* Fragment shader — slow mesh-gradient with brand palette */
+      var fsrc = [
+        'precision mediump float;',
+        'uniform float time;',
+        'uniform vec3 c1;',  /* warm ivory  #F7F4EF */
+        'uniform vec3 c2;',  /* teal wash   #C8E8E8 */
+        'uniform vec3 c3;',  /* navy tint   #D6DDE8 */
+        'varying vec2 vUv;',
+        'void main(){',
+        '  vec2 uv=vUv;',
+        /* Three overlapping sine waves — large, slow, different angles */
+        '  float w1=sin(uv.x*3.8+time*0.22)*cos(uv.y*2.9+time*0.16);',
+        '  float w2=sin(uv.x*6.5-time*0.28+1.4)*cos(uv.y*4.7+time*0.20+0.9);',
+        '  float w3=sin((uv.x*0.7+uv.y)*4.2+time*0.18)*cos((uv.x-uv.y*0.5)*3.1-time*0.14);',
+        '  float t=clamp((w1+w2*0.55+w3*0.38)*0.35+0.5,0.0,1.0);',
+        /* Second blend axis for a three-colour effect */
+        '  float t2=clamp((w2+w3*0.6-w1*0.3)*0.32+0.5,0.0,1.0);',
+        '  vec3 col=mix(c1,c2,t);',
+        '  col=mix(col,c3,t2*0.45);',
+        /* Subtle centre brightening */
+        '  float d=1.0-length(uv-0.5)*0.85;',
+        '  col+=c1*clamp(d,0.0,1.0)*0.08;',
+        '  gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);',
+        '}'
+      ].join('\n');
+
+      function mkShader(type, src) {
+        var s = gl.createShader(type);
+        gl.shaderSource(s, src); gl.compileShader(s); return s;
+      }
+      var prog = gl.createProgram();
+      gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,   vsrc));
+      gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, fsrc));
+      gl.linkProgram(prog); gl.useProgram(prog);
+
+      /* Full-screen quad (two triangles) */
+      var pos = new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]);
+      var uvs = new Float32Array([ 0, 0, 1, 0,  0,1,  0,1, 1, 0, 1,1]);
+
+      var pb = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, pb);
+      gl.bufferData(gl.ARRAY_BUFFER, pos, gl.STATIC_DRAW);
+      var aP = gl.getAttribLocation(prog, 'aPos');
+      gl.enableVertexAttribArray(aP);
+      gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
+
+      var ub = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, ub);
+      gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
+      var aU = gl.getAttribLocation(prog, 'aUv');
+      gl.enableVertexAttribArray(aU);
+      gl.vertexAttribPointer(aU, 2, gl.FLOAT, false, 0, 0);
+
+      var uTime = gl.getUniformLocation(prog, 'time');
+      var uC1   = gl.getUniformLocation(prog, 'c1');
+      var uC2   = gl.getUniformLocation(prog, 'c2');
+      var uC3   = gl.getUniformLocation(prog, 'c3');
+
+      /* Brand palette */
+      gl.uniform3f(uC1, 0.969, 0.957, 0.937); /* #F7F4EF warm ivory */
+      gl.uniform3f(uC2, 0.784, 0.910, 0.910); /* #C8E8E8 light teal  */
+      gl.uniform3f(uC3, 0.839, 0.867, 0.910); /* #D6DDE8 navy tint   */
+
+      var t0 = performance.now();
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* Draw static frame when motion is reduced */
+      gl.uniform1f(uTime, 12.0); /* mid-cycle snapshot */
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      if (!reduced) {
+        function frame() {
+          gl.uniform1f(uTime, (performance.now() - t0) / 1000);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+    })();
+  </script>
+</body>
+</html>
