@@ -778,42 +778,143 @@
     @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
 
     /* ── RESPONSIVE ── */
+
+    /* iPad / tablet ≤ 1024px */
     @media (max-width: 1024px) {
+      #works, #cta-strip, #process, #testimonials,
+      #pricing, #about, #recognition, #contact, #team { padding: 72px 0; }
+
       .work-item { grid-template-columns: 1fr 1fr; gap: 28px; }
       .work-thumb { display: none; }
       .process-grid { grid-template-columns: 1fr; gap: 48px; }
       .process-left { position: static; }
       .about-grid { grid-template-columns: 1fr; gap: 48px; }
       .about-left { position: static; }
+      .about-photo { aspect-ratio: 16/9; }
       .recognition-grid { grid-template-columns: 1fr; gap: 32px; }
-      .contact-grid { grid-template-columns: 1fr; gap: 56px; }
-      .team-grid { grid-template-columns: repeat(2,1fr); }
+      .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
       .team-card:nth-child(2) { border-right: none; }
       .team-card:nth-child(3) { border-top: 1px solid var(--border); }
-      .about-photo { aspect-ratio: 16/9; }
     }
+
+    /* Mobile ≤ 768px */
     @media (max-width: 768px) {
       .container { padding-inline: 20px; }
+
+      /* Nav */
       .nav-links, .nav-right { display: none; }
       .hamburger { display: flex; }
-      .works-header { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .work-item { grid-template-columns: 1fr; gap: 16px; }
+
+      /* Section padding */
+      #works, #cta-strip, #process, #testimonials,
+      #pricing, #about, #recognition, #contact, #team { padding: 60px 0; }
+
+      /* Hero */
+      .hero-content { padding-top: 108px; }
+      #hero { padding-bottom: 64px; }
+      .hero-meta {
+        flex-direction: column; align-items: flex-start;
+        gap: 8px; margin-bottom: 24px;
+      }
+      .hero-meta-item { font-size: 12px; }
+      .hero-h1 { margin-bottom: 18px; }
+      .hero-sub { margin-bottom: 28px; font-size: 15px; }
+      .hero-actions { flex-direction: column; align-items: stretch; gap: 12px; }
+      .btn-hero-primary, .btn-hero-secondary {
+        justify-content: center;
+        padding: 15px 20px;
+        min-height: 50px;
+      }
+
+      /* Works */
+      .works-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .work-item {
+        display: flex; flex-direction: column; gap: 16px;
+        padding: 28px 0;
+      }
+      .work-thumb {
+        display: block;
+        width: 100%; aspect-ratio: 16/9;
+        border-radius: 10px; overflow: hidden;
+        order: -1;
+      }
+      .work-thumb img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.06) saturate(0.8); }
+
+      /* Photo break */
+      .photo-break { height: 260px; }
+
+      /* CTA strip */
+      .cta-strip-h2 { text-align: left; }
+
+      /* FAQ */
+      .faq-q-text { font-size: 15px; }
+
+      /* Testimonials */
+      .testimonial-card { min-width: 270px; max-width: 270px; padding: 22px; }
+
+      /* Pricing */
       .pricing-grid { grid-template-columns: 1fr; border-radius: 12px; }
       .pricing-card { border-right: none; border-bottom: 1px solid var(--border); }
       .pricing-card:last-child { border-bottom: none; }
       .pricing-card.popular { order: -1; }
+      .pricing-card { padding: 32px 28px; }
+
+      /* Team */
       .team-grid { grid-template-columns: 1fr 1fr; }
+
+      /* About stats */
       .about-stats { grid-template-columns: 1fr 1fr; }
       .about-stat:nth-child(2) { border-right: none; }
       .about-stat:nth-child(3) { border-top: 1px solid var(--border); grid-column: span 2; }
+
+      /* Form */
       .form-row { grid-template-columns: 1fr; }
-      .footer-top { flex-direction: column; align-items: flex-start; }
-      .photo-break { height: 320px; }
+      .form-input, .form-textarea, .form-select { min-height: 48px; font-size: 16px; } /* prevent iOS zoom */
+
+      /* Footer */
+      .footer-top { flex-direction: column; align-items: flex-start; gap: 28px; }
+      .footer-nav { flex-direction: column; gap: 14px; }
+      .footer-bottom { flex-direction: column; gap: 6px; }
+      footer { padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
     }
+
+    /* Small mobile ≤ 480px */
     @media (max-width: 480px) {
+      .container { padding-inline: 16px; }
+
+      /* Hero */
+      .hero-content { padding-top: 88px; }
+      #hero { padding-bottom: 52px; }
+
+      /* Sections */
+      #works, #cta-strip, #process, #testimonials,
+      #pricing, #about, #recognition, #contact, #team { padding: 52px 0; }
+      .section-label { margin-bottom: 32px; }
+
+      /* Works */
+      .work-item { padding: 22px 0; }
+
+      /* Photo break */
+      .photo-break { height: 210px; }
+
+      /* Testimonials */
+      .testimonial-card { min-width: 248px; max-width: 248px; }
+
+      /* Team */
       .team-grid { grid-template-columns: 1fr; }
       .team-card { border-right: none; border-bottom: 1px solid var(--border); }
       .team-card:last-child { border-bottom: none; }
+
+      /* About stats */
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .about-stat:nth-child(3) { grid-column: span 2; }
+
+      /* Pricing */
+      .pricing-card { padding: 28px 20px; }
+
+      /* Process */
+      .faq-item { padding: 22px 0; }
     }
   </style>
 </head>
