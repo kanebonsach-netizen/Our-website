@@ -131,7 +131,6 @@
       border: 1.5px solid rgba(255,255,255,0.18);
       border-radius: 100px;
       padding: 5px;
-      position: absolute; left: 50%; transform: translateX(-50%);
     }
     nav.light .nav-links { border-color: var(--border); }
     .nav-links li { position: relative; z-index: 1; list-style: none; }
@@ -218,11 +217,13 @@
       animation: menuSlideIn 0.38s cubic-bezier(0.22,1,0.36,1) forwards;
     }
     .mobile-menu a {
-      font-size: 26px; font-weight: 700;
-      color: var(--black); letter-spacing: -0.03em;
-      padding: 16px 0; border-bottom: 1px solid var(--border);
-      min-height: 56px; display: flex; align-items: center;
+      font-size: 20px; font-weight: 600;
+      color: var(--black); letter-spacing: -0.02em;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+      min-height: 50px; display: flex; align-items: center;
+      transition: color 0.2s;
     }
+    .mobile-menu a:hover { color: var(--teal); }
     .mobile-cta {
       margin-top: 28px; font-size: 16px; font-weight: 600;
       background: var(--black); color: white !important;
@@ -863,6 +864,10 @@
 
     /* iPad / tablet ≤ 1024px */
     @media (max-width: 1024px) {
+      /* Nav */
+      .nav-links, .nav-right { display: none; }
+      .hamburger { display: flex; }
+
       #works, #cta-strip, #process, #testimonials,
       #pricing, #about, #recognition, #contact, #team { padding: 72px 0; }
 
@@ -883,10 +888,6 @@
     /* Mobile ≤ 768px */
     @media (max-width: 768px) {
       .container { padding-inline: 20px; }
-
-      /* Nav */
-      .nav-links, .nav-right { display: none; }
-      .hamburger { display: flex; }
 
       /* Section padding */
       #works, #cta-strip, #process, #testimonials,
