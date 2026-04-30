@@ -1,0 +1,17 @@
+# Robots.txt for Cove Studio - Allow Google and all search engines to crawl
+User-agent: *
+Allow: /
+Allow: /sitemap.xml
+
+# Specific disallow rules (if needed)
+# Disallow: /admin/
+# Disallow: /private/
+
+# Sitemaps
+Sitemap: https://covestudiomallorca.com/sitemap.xml
+
+# Crawl delay (optional - 0 means no delay)
+Crawl-delay: 0
+
+# Host preference
+Host: https://covestudiomallorca.com

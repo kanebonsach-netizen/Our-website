@@ -4,10 +4,95 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cove Studio — Diseño Web y Marketing Digital en Mallorca</title>
-  <meta name="description" content="Webs de alto impacto y marketing para marcas ambiciosas. Basados en Mallorca, trabajamos en todo el mundo." />
+  <meta name="description" content="Agencia de diseño web y marketing digital en Mallorca. Creamos webs de alto impacto y estrategias de marketing para marcas ambiciosas en todo el mundo." />
+  <meta name="keywords" content="diseño web Mallorca, marketing digital Mallorca, agencia web Mallorca, diseñadores web, web design Mallorca, marketing agency Mallorca" />
+  <meta name="robots" content="index, follow" />
+  <meta name="language" content="Spanish" />
+  <meta name="author" content="Cove Studio" />
+  <link rel="canonical" href="https://covestudiomallorca.com/" />
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://covestudiomallorca.com/" />
+  <meta property="og:title" content="Cove Studio — Diseño Web y Marketing Digital en Mallorca" />
+  <meta property="og:description" content="Agencia de diseño web y marketing digital en Mallorca. Creamos webs de alto impacto y estrategias de marketing para marcas ambiciosas." />
+  <meta property="og:image" content="https://covestudiomallorca.com/brand_assets/og-image.png" />
+  <meta property="og:site_name" content="Cove Studio" />
+  <meta property="og:locale" content="es_ES" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://covestudiomallorca.com/" />
+  <meta name="twitter:title" content="Cove Studio — Diseño Web y Marketing Digital en Mallorca" />
+  <meta name="twitter:description" content="Agencia de diseño web y marketing digital en Mallorca. Creamos webs de alto impacto y estrategias de marketing para marcas ambiciosas." />
+  <meta name="twitter:image" content="https://covestudiomallorca.com/brand_assets/og-image.png" />
+
+  <!-- Verification -->
+  <meta name="google-site-verification" content="YOUR_GOOGLE_VERIFICATION_CODE" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Sitemap and Feeds -->
+  <link rel="sitemap" href="https://covestudiomallorca.com/sitemap.xml" />
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Cove Studio",
+    "image": "https://covestudiomallorca.com/brand_assets/og-image.png",
+    "description": "Agencia de diseño web y marketing digital en Mallorca. Creamos webs de alto impacto y estrategias de marketing para marcas ambiciosas.",
+    "url": "https://covestudiomallorca.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Mallorca",
+      "addressRegion": "Islas Baleares",
+      "addressCountry": "ES"
+    },
+    "areaServed": [
+      {
+        "@type": "Country",
+        "name": "Spain"
+      },
+      {
+        "@type": "Country",
+        "name": "International"
+      }
+    ],
+    "serviceType": ["Web Design", "Digital Marketing", "Web Development", "Marketing Strategy"],
+    "priceRange": "$$",
+    "contact": {
+      "@type": "ContactPoint",
+      "contactType": "Customer Service",
+      "availableLanguage": ["Spanish", "English"]
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Cove Studio",
+    "url": "https://covestudiomallorca.com",
+    "logo": "https://covestudiomallorca.com/brand_assets/logo.png",
+    "description": "Agencia de diseño web y marketing digital en Mallorca",
+    "sameAs": [
+      "https://www.instagram.com/covestudio",
+      "https://www.linkedin.com/company/cove-studio",
+      "https://www.twitter.com/covestudio"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Mallorca",
+      "addressRegion": "Islas Baleares",
+      "addressCountry": "ES"
+    }
+  }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; font-size: 16px; }
@@ -188,12 +273,10 @@
 
     /* ── Hamburger → X ── */
     .hamburger {
-      display: flex; flex-direction: column;
+      display: none !important;
+      flex-direction: column;
       gap: 5px; padding: 10px; cursor: pointer;
       position: relative; z-index: 202;
-    }
-    @media (min-width: 1000px) {
-      .hamburger { display: none; }
     }
     .hamburger span {
       display: block; width: 22px; height: 2px;
@@ -213,7 +296,7 @@
       to   { transform: translateX(0); }
     }
     .mobile-menu {
-      display: none;
+      display: none !important;
       flex-direction: column;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -224,8 +307,7 @@
       -webkit-overflow-scrolling: touch;
     }
     .mobile-menu.open {
-      display: flex;
-      animation: menuSlideIn 0.38s cubic-bezier(0.22,1,0.36,1) forwards;
+      display: none !important;
     }
     .mobile-menu a {
       font-size: 20px; font-weight: 600;
