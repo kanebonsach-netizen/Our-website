@@ -1095,6 +1095,9 @@
   <!-- WebGL shader background -->
   <canvas id="shader-bg" aria-hidden="true"></canvas>
 
+  <!-- Etheral Shadow Background Canvas -->
+  <canvas id="etheral-canvas" aria-hidden="true" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"></canvas>
+
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <a href="#works" onclick="toggleMenu()" data-i18n="nav.work">Trabajo</a>
@@ -1572,8 +1575,33 @@
 
   <script>
     const nav = document.getElementById('navbar');
+    let lastScrollY = 0;
+    let isNavVisible = true;
+
     window.addEventListener('scroll', () => {
-      nav.classList.toggle('light', window.scrollY > 80);
+      const currentScrollY = window.scrollY;
+
+      // Toggle light class based on position
+      nav.classList.toggle('light', currentScrollY > 80);
+
+      // Hide/show navbar based on scroll direction
+      if (currentScrollY > lastScrollY && currentScrollY > 80) {
+        // Scrolling down
+        if (isNavVisible) {
+          nav.style.transform = 'translateY(-100%)';
+          nav.style.transition = 'transform 0.3s ease-in-out';
+          isNavVisible = false;
+        }
+      } else {
+        // Scrolling up
+        if (!isNavVisible) {
+          nav.style.transform = 'translateY(0)';
+          nav.style.transition = 'transform 0.3s ease-in-out';
+          isNavVisible = true;
+        }
+      }
+
+      lastScrollY = currentScrollY;
     }, { passive: true });
 
     function toggleMenu() {
@@ -1975,6 +2003,82 @@
         }
         requestAnimationFrame(frame);
       }
+    })();
+
+    /* ── Etheral Shadow Canvas Background ── */
+    (function() {
+      const canvas = document.getElementById('etheral-canvas');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      let time = 0;
+      let animationId = null;
+
+      function perlinNoise(x, y, t) {
+        return Math.sin(x * 0.002 + t * 0.3) * Math.cos(y * 0.003 + t * 0.2) * Math.sin((x + y) * 0.001 + t * 0.15);
+      }
+
+      function drawGradientBlob(x, y, size, color1, color2, alpha) {
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+        gradient.addColorStop(0, color1);
+        gradient.addColorStop(0.5, color2);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function animate() {
+        // Fade previous frame slightly for motion trail
+        ctx.fillStyle = 'rgba(247, 244, 239, 0.98)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        time += 0.002;
+
+        // Large slow-moving accent blobs with brand colors
+        const blob1X = canvas.width * 0.25 + Math.sin(time * 0.3) * 200;
+        const blob1Y = canvas.height * 0.4 + Math.cos(time * 0.25) * 150;
+        drawGradientBlob(blob1X, blob1Y, 500, 'rgba(46, 143, 143, 0.08)', 'rgba(61, 170, 170, 0.04)', 0.08);
+
+        const blob2X = canvas.width * 0.75 + Math.sin(time * 0.2 + Math.PI) * 180;
+        const blob2Y = canvas.height * 0.6 + Math.cos(time * 0.18 + Math.PI) * 140;
+        drawGradientBlob(blob2X, blob2Y, 450, 'rgba(27, 43, 69, 0.06)', 'rgba(107, 107, 107, 0.03)', 0.06);
+
+        const blob3X = canvas.width * 0.5 + Math.sin(time * 0.15 + Math.PI * 0.5) * 220;
+        const blob3Y = canvas.height * 0.3 + Math.cos(time * 0.12 + Math.PI * 0.5) * 180;
+        drawGradientBlob(blob3X, blob3Y, 550, 'rgba(168, 164, 158, 0.05)', 'rgba(200, 200, 200, 0.02)', 0.05);
+
+        // Fine grain texture overlay
+        for (let i = 0; i < 15; i++) {
+          const gx = Math.random() * canvas.width;
+          const gy = Math.random() * canvas.height;
+          const gsize = Math.random() * 300 + 100;
+          const opacity = Math.sin(time + i) * 0.003 + 0.002;
+          ctx.fillStyle = `rgba(100, 100, 100, ${opacity})`;
+          ctx.fillRect(gx, gy, gsize, gsize);
+        }
+
+        animationId = requestAnimationFrame(animate);
+      }
+
+      if (!reduced) {
+        animate();
+      }
+
+      window.addEventListener('beforeunload', () => {
+        if (animationId) cancelAnimationFrame(animationId);
+      });
     })();
   </script>
 </body>
