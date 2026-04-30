@@ -124,6 +124,43 @@
     nav.light .nav-logo { color: var(--black); }
     .nav-logo img { height: 30px; width: 30px; object-fit: contain; }
 
+    /* ── Sliding pill nav (desktop) ── */
+    .nav-links {
+      display: none !important; align-items: center; gap: 0;
+      position: absolute; left: 50%; transform: translateX(-50%);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 100px;
+      padding: 5px;
+    }
+    @media (min-width: 1200px) {
+      .nav-links { display: flex !important; }
+    }
+    nav.light .nav-links { border-color: var(--border); }
+    .nav-links li { position: relative; z-index: 1; list-style: none; }
+    .nav-links a {
+      display: block;
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      padding: 7px 16px;
+      border-radius: 100px;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    nav.light .nav-links a { color: var(--gray); }
+    .nav-links a:hover { color: white; }
+    nav.light .nav-links a:hover { color: var(--black); }
+    .nav-pill {
+      position: absolute;
+      top: 5px; height: calc(100% - 10px);
+      background: rgba(255,255,255,0.14);
+      border-radius: 100px;
+      pointer-events: none; z-index: 0;
+      opacity: 0;
+      transition: left 0.22s cubic-bezier(0.25,0.46,0.45,0.94),
+                  width 0.22s cubic-bezier(0.25,0.46,0.45,0.94),
+                  opacity 0.15s;
+    }
+    nav.light .nav-pill { background: rgba(0,0,0,0.06); }
 
     .nav-right { display: none !important; align-items: center; gap: 20px; }
     @media (min-width: 1200px) {
@@ -995,6 +1032,14 @@
         <img src="brand_assets/dummy-removebg-preview.png" alt="Cove Studio" />
         <span>Cove Studio</span>
       </a>
+      <ul class="nav-links" id="navLinks">
+        <div class="nav-pill" id="navPill" aria-hidden="true"></div>
+        <li><a href="#works" data-i18n="nav.work">Trabajo</a></li>
+        <li><a href="#process" data-i18n="nav.process">Proceso</a></li>
+        <li><a href="#pricing" data-i18n="nav.pricing">Precios</a></li>
+        <li><a href="#team" data-i18n="nav.team">Equipo</a></li>
+        <li><a href="#about" data-i18n="nav.about">Nosotros</a></li>
+      </ul>
       <div class="nav-right">
         <a href="https://instagram.com" class="nav-social" target="_blank" rel="noopener">Instagram</a>
         <a href="https://linkedin.com" class="nav-social" target="_blank" rel="noopener">LinkedIn</a>
@@ -1457,6 +1502,23 @@
       document.body.style.overflow = open ? 'hidden' : '';
     }
 
+    /* ── Sliding pill nav hover effect ── */
+    (function () {
+      const ul   = document.getElementById('navLinks');
+      const pill = document.getElementById('navPill');
+      if (!ul || !pill) return;
+      const items = ul.querySelectorAll('li');
+      items.forEach(function (li) {
+        li.addEventListener('mouseenter', function () {
+          pill.style.left    = li.offsetLeft + 'px';
+          pill.style.width   = li.offsetWidth + 'px';
+          pill.style.opacity = '1';
+        });
+      });
+      ul.addEventListener('mouseleave', function () {
+        pill.style.opacity = '0';
+      });
+    })();
 
     /* ── Language switcher ── */
     var LANG = {
