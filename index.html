@@ -131,6 +131,8 @@
       border: 1.5px solid rgba(255,255,255,0.18);
       border-radius: 100px;
       padding: 5px;
+      overflow: hidden;
+      max-width: calc(100% - 200px);
     }
     nav.light .nav-links { border-color: var(--border); }
     .nav-links li { position: relative; z-index: 1; list-style: none; }
@@ -862,8 +864,8 @@
 
     /* ── RESPONSIVE ── */
 
-    /* iPad / tablet ≤ 1024px */
-    @media (max-width: 1024px) {
+    /* iPad / tablet ≤ 900px */
+    @media (max-width: 900px) {
       /* Nav */
       .nav-links, .nav-right { display: none; }
       .hamburger { display: flex; }
