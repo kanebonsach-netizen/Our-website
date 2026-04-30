@@ -126,14 +126,16 @@
 
     /* ── Sliding pill nav (desktop) ── */
     .nav-links {
-      display: none !important; align-items: center; gap: 0;
+      display: flex; align-items: center; gap: 0;
       position: absolute; left: 50%; transform: translateX(-50%);
       border: 1.5px solid rgba(255,255,255,0.18);
       border-radius: 100px;
       padding: 5px;
+      overflow: hidden;
+      flex-wrap: nowrap;
     }
-    @media (min-width: 1200px) {
-      .nav-links { display: flex !important; }
+    @media (max-width: 1000px) {
+      .nav-links { display: none !important; }
     }
     nav.light .nav-links { border-color: var(--border); }
     .nav-links li { position: relative; z-index: 1; list-style: none; }
@@ -163,7 +165,7 @@
     nav.light .nav-pill { background: rgba(0,0,0,0.06); }
 
     .nav-right { display: none !important; align-items: center; gap: 20px; }
-    @media (min-width: 1200px) {
+    @media (min-width: 1000px) {
       .nav-right { display: flex !important; }
     }
     .nav-social {
@@ -190,7 +192,7 @@
       gap: 5px; padding: 10px; cursor: pointer;
       position: relative; z-index: 202;
     }
-    @media (min-width: 1200px) {
+    @media (min-width: 1000px) {
       .hamburger { display: none; }
     }
     .hamburger span {
