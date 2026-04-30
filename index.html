@@ -198,36 +198,71 @@
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
     /* ── Mobile menu ── */
+    @keyframes menuSlideIn {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
     .mobile-menu {
-      display: flex;
+      display: none;
       flex-direction: column;
-      position: fixed; inset: 0;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: #F7F4EF;
       z-index: 200;
       padding: 88px 32px 48px; gap: 0;
-      transform: translateX(100%);
-      visibility: hidden;
-      transition: transform 0.42s cubic-bezier(0.22,1,0.36,1),
-                  visibility 0s 0.42s;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .mobile-menu.open {
-      transform: translateX(0);
-      visibility: visible;
-      transition: transform 0.42s cubic-bezier(0.22,1,0.36,1),
-                  visibility 0s 0s;
+      display: flex;
+      animation: menuSlideIn 0.38s cubic-bezier(0.22,1,0.36,1) forwards;
     }
     .mobile-menu a {
-      font-size: 28px; font-weight: 700;
+      font-size: 26px; font-weight: 700;
       color: var(--black); letter-spacing: -0.03em;
       padding: 16px 0; border-bottom: 1px solid var(--border);
       min-height: 56px; display: flex; align-items: center;
     }
     .mobile-cta {
-      margin-top: 32px; font-size: 16px; font-weight: 600;
-      background: var(--black); color: white;
+      margin-top: 28px; font-size: 16px; font-weight: 600;
+      background: var(--black); color: white !important;
       padding: 16px 24px; border-radius: 10px; text-align: center;
-      min-height: 52px; display: flex; align-items: center; justify-content: center;
+      min-height: 52px; display: flex !important; align-items: center; justify-content: center;
+      border-bottom: none !important;
     }
+    .mobile-lang {
+      display: flex; align-items: center; gap: 8px;
+      padding: 20px 0 0; margin-top: auto;
+    }
+    .mobile-lang-btn {
+      font-size: 13px; font-weight: 700;
+      color: var(--gray-light); cursor: pointer;
+      padding: 6px 12px; border-radius: 6px;
+      border: 1.5px solid var(--border);
+      background: none; font-family: inherit;
+      transition: all 0.2s;
+    }
+    .mobile-lang-btn.active { color: var(--black); border-color: var(--black); }
+
+    /* ── Language toggle (desktop) ── */
+    .lang-toggle {
+      display: flex; align-items: center; gap: 2px;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 8px; overflow: hidden;
+      flex-shrink: 0;
+    }
+    nav.light .lang-toggle { border-color: var(--border); }
+    .lang-btn {
+      font-size: 12px; font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      padding: 6px 9px; cursor: pointer;
+      background: none; border: none;
+      font-family: inherit; transition: all 0.2s;
+      min-width: 36px; text-align: center;
+    }
+    nav.light .lang-btn { color: var(--gray-light); }
+    .lang-btn.active { color: white; background: rgba(255,255,255,0.15); border-radius: 6px; }
+    nav.light .lang-btn.active { color: var(--black); background: rgba(0,0,0,0.07); }
 
     /* ── HERO ── */
     #hero {
@@ -972,12 +1007,16 @@
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <a href="#works" onclick="toggleMenu()">Trabajo</a>
-    <a href="#process" onclick="toggleMenu()">Proceso</a>
-    <a href="#pricing" onclick="toggleMenu()">Precios</a>
-    <a href="#team" onclick="toggleMenu()">Equipo</a>
-    <a href="#about" onclick="toggleMenu()">Nosotros</a>
-    <a href="#contact" onclick="toggleMenu()" class="mobile-cta">Empezar un proyecto</a>
+    <a href="#works" onclick="toggleMenu()" data-i18n="nav.work">Trabajo</a>
+    <a href="#process" onclick="toggleMenu()" data-i18n="nav.process">Proceso</a>
+    <a href="#pricing" onclick="toggleMenu()" data-i18n="nav.pricing">Precios</a>
+    <a href="#team" onclick="toggleMenu()" data-i18n="nav.team">Equipo</a>
+    <a href="#about" onclick="toggleMenu()" data-i18n="nav.about">Nosotros</a>
+    <a href="#contact" onclick="toggleMenu()" class="mobile-cta" data-i18n="nav.cta.long">Empezar un proyecto</a>
+    <div class="mobile-lang">
+      <button class="mobile-lang-btn active" data-lang="es" onclick="setLang('es')">ES</button>
+      <button class="mobile-lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
   </div>
 
   <!-- Nav -->
@@ -989,16 +1028,20 @@
       </a>
       <ul class="nav-links" id="navLinks">
         <div class="nav-pill" id="navPill" aria-hidden="true"></div>
-        <li><a href="#works">Trabajo</a></li>
-        <li><a href="#process">Proceso</a></li>
-        <li><a href="#pricing">Precios</a></li>
-        <li><a href="#team">Equipo</a></li>
-        <li><a href="#about">Nosotros</a></li>
+        <li><a href="#works" data-i18n="nav.work">Trabajo</a></li>
+        <li><a href="#process" data-i18n="nav.process">Proceso</a></li>
+        <li><a href="#pricing" data-i18n="nav.pricing">Precios</a></li>
+        <li><a href="#team" data-i18n="nav.team">Equipo</a></li>
+        <li><a href="#about" data-i18n="nav.about">Nosotros</a></li>
       </ul>
       <div class="nav-right">
         <a href="https://instagram.com" class="nav-social" target="_blank" rel="noopener">Instagram</a>
         <a href="https://linkedin.com" class="nav-social" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="#contact" class="btn-nav">Empezar proyecto</a>
+        <div class="lang-toggle" aria-label="Language">
+          <button class="lang-btn active" data-lang="es" onclick="setLang('es')">ES</button>
+          <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+        </div>
+        <a href="#contact" class="btn-nav" data-i18n="nav.cta">Empezar proyecto</a>
       </div>
       <button class="hamburger" onclick="toggleMenu()" id="hamburgerBtn" aria-label="Abrir menú">
         <span></span><span></span><span></span>
@@ -1014,23 +1057,23 @@
     <div class="hero-overlay"></div>
     <div class="container hero-content">
       <div class="hero-meta reveal">
-        <span class="hero-meta-item">Disponibles para nuevos proyectos</span>
-        <span class="hero-meta-item">Más de 50 empresas confían en nosotros</span>
-        <span class="hero-meta-item">Web, Branding, Marketing</span>
+        <span class="hero-meta-item" data-i18n="hero.m1">Disponibles para nuevos proyectos</span>
+        <span class="hero-meta-item" data-i18n="hero.m2">Más de 50 empresas confían en nosotros</span>
+        <span class="hero-meta-item" data-i18n="hero.m3">Web, Branding, Marketing</span>
       </div>
-      <h1 class="hero-h1 reveal d1">
+      <h1 class="hero-h1 reveal d1" data-i18n="hero.h1">
         Webs de alto impacto y marketing para marcas ambiciosas. Convierte más visitas, genera confianza y haz crecer tu negocio.
       </h1>
-      <p class="hero-sub reveal d2">
+      <p class="hero-sub reveal d2" data-i18n="hero.sub">
         Desde landing pages sencillas hasta estrategias digitales completas — cada decisión es intencionada y pensada para generar resultados a largo plazo.
       </p>
       <div class="hero-actions reveal d3">
         <a href="#contact" class="btn-hero-primary">
-          Empezar un proyecto
+          <span data-i18n="hero.cta1">Empezar un proyecto</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         <a href="#works" class="btn-hero-secondary">
-          Ver nuestro trabajo
+          <span data-i18n="hero.cta2">Ver nuestro trabajo</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
@@ -1468,6 +1511,199 @@
         pill.style.opacity = '0';
       });
     })();
+
+    /* ── Language switcher ── */
+    var LANG = {
+      es: {
+        'nav.work':'Trabajo','nav.process':'Proceso','nav.pricing':'Precios',
+        'nav.team':'Equipo','nav.about':'Nosotros','nav.cta':'Empezar proyecto',
+        'nav.cta.long':'Empezar un proyecto',
+        'hero.m1':'Disponibles para nuevos proyectos',
+        'hero.m2':'Más de 50 empresas confían en nosotros',
+        'hero.m3':'Web, Branding, Marketing',
+        'hero.h1':'Webs de alto impacto y marketing para marcas ambiciosas. Convierte más visitas, genera confianza y haz crecer tu negocio.',
+        'hero.sub':'Desde landing pages sencillas hasta estrategias digitales completas — cada decisión es intencionada y pensada para generar resultados a largo plazo.',
+        'hero.cta1':'Empezar un proyecto','hero.cta2':'Ver nuestro trabajo',
+        /* Section selectors — applied directly by querySelector */
+        '>>works.label':'Proyectos','>>works.title':'Proyectos Destacados','>>works.cta':'Empezar un proyecto',
+        '>>cta.text':'Desde primeros lanzamientos hasta marcas consolidadas, cada decisión es intencionada y pensada para el impacto a largo plazo.',
+        '>>cta.btn':'Empezar un proyecto',
+        '>>process.label':'Proceso','>>process.title':'Cómo trabajamos',
+        '>>process.sub':'Simple, transparente y centrado en ti. Esto es lo que significa trabajar con Cove Studio.',
+        '>>test.label':'Testimonios','>>test.title':'Lo que dicen nuestros clientes',
+        '>>pricing.label':'Precios','>>pricing.title':'Precios transparentes, sin sorpresas.',
+        '>>pricing.sub':'Cada plan incluye una tarifa única de configuración y una cuota mensual de mantenimiento, soporte y hosting.',
+        '>>team.label':'Equipo','>>team.title':'Las personas detrás del trabajo.',
+        '>>team.sub':'Cuatro especialistas en Mallorca. Sin subcontrataciones, sin intermediarios — solo las personas que hacen el trabajo.',
+        '>>about.label':'Nosotros','>>about.title':'Un equipo pequeño con un gran enfoque.',
+        '>>recog.label':'Reconocimientos','>>recog.title':'Prensa y menciones',
+        '>>contact.label':'Contacto','>>contact.title':'Empieza un proyecto con nosotros.',
+        '>>contact.sub':'Cuéntanos tu proyecto y te respondemos en menos de 24 horas. Sin compromiso, sin presión — solo una conversación.',
+        '>>contact.loc':'Mallorca, España','>>contact.resp':'Respuesta en menos de 24 horas',
+        '>>form.name':'NOMBRE','>>form.email':'EMAIL','>>form.plan':'PLAN DE INTERÉS',
+        '>>form.msg':'CUÉNTANOS TU PROYECTO','>>form.btn':'Enviar mensaje',
+        '>>footer.copy':'© 2025 Cove Studio. Todos los derechos reservados.',
+        '>>footer.loc':'Mallorca, España',
+        '>>team.r1':'Marketing','>>team.r2':'Agente de Ventas','>>team.r3':'Desarrollador Web','>>team.r4':'Programador',
+        '>>stat1':'Proyectos entregados','>>stat2':'Satisfacción de clientes','>>stat3':'Semanas de media',
+      },
+      en: {
+        'nav.work':'Work','nav.process':'Process','nav.pricing':'Pricing',
+        'nav.team':'Team','nav.about':'About','nav.cta':'Start project',
+        'nav.cta.long':'Start a project',
+        'hero.m1':'Available for new projects',
+        'hero.m2':'Trusted by 50+ businesses',
+        'hero.m3':'Web, Branding, Marketing',
+        'hero.h1':'High-impact websites and marketing for ambitious brands. Convert more visitors, build trust, and grow your business.',
+        'hero.sub':'From simple landing pages to complete digital strategies — every decision is intentional and designed to generate long-term results.',
+        'hero.cta1':'Start a project','hero.cta2':'View our work',
+        '>>works.label':'Projects','>>works.title':'Featured Projects','>>works.cta':'Start a project',
+        '>>cta.text':'From first launches to established brands, every decision is intentional and designed for long-term impact.',
+        '>>cta.btn':'Start a project',
+        '>>process.label':'Process','>>process.title':'How we work',
+        '>>process.sub':'Simple, transparent and focused on you. This is what working with Cove Studio means.',
+        '>>test.label':'Testimonials','>>test.title':'What our clients say',
+        '>>pricing.label':'Pricing','>>pricing.title':'Transparent pricing, no surprises.',
+        '>>pricing.sub':'Each plan includes a one-time setup fee and a monthly maintenance, support and hosting fee.',
+        '>>team.label':'Team','>>team.title':'The people behind the work.',
+        '>>team.sub':'Four specialists in Mallorca. No outsourcing, no middlemen — just the people doing the work.',
+        '>>about.label':'About','>>about.title':'A small team with a big focus.',
+        '>>recog.label':'Recognition','>>recog.title':'Press & mentions',
+        '>>contact.label':'Contact','>>contact.title':'Start a project with us.',
+        '>>contact.sub':"Tell us about your project and we'll get back to you within 24 hours. No commitment, no pressure — just a conversation.",
+        '>>contact.loc':'Mallorca, Spain','>>contact.resp':'Response within 24 hours',
+        '>>form.name':'NAME','>>form.email':'EMAIL','>>form.plan':'PLAN OF INTEREST',
+        '>>form.msg':'TELL US ABOUT YOUR PROJECT','>>form.btn':'Send message',
+        '>>footer.copy':'© 2025 Cove Studio. All rights reserved.',
+        '>>footer.loc':'Mallorca, Spain',
+        '>>team.r1':'Marketing','>>team.r2':'Sales Agent','>>team.r3':'Web Developer','>>team.r4':'Programmer',
+        '>>stat1':'Projects delivered','>>stat2':'Client satisfaction','>>stat3':'Weeks average',
+      }
+    };
+
+    /* Maps keys starting with ">>" to DOM selectors */
+    var SEL_MAP = {
+      '>>works.label':   '#works .section-label',
+      '>>works.title':   '.works-title',
+      '>>works.cta':     '.works-link',
+      '>>cta.text':      '.cta-strip-h2',
+      '>>cta.btn':       '#cta-strip .btn-primary',
+      '>>process.label': '#process .section-label',
+      '>>process.title': '.process-title',
+      '>>process.sub':   '.process-sub',
+      '>>test.label':    '#testimonials .section-label',
+      '>>test.title':    '.testimonials-title',
+      '>>pricing.label': '#pricing .section-label',
+      '>>pricing.title': '.pricing-title',
+      '>>pricing.sub':   '.pricing-sub',
+      '>>team.label':    '#team .section-label',
+      '>>team.title':    '.team-title',
+      '>>team.sub':      '.team-sub',
+      '>>about.label':   '#about .section-label',
+      '>>about.title':   '.about-title',
+      '>>recog.label':   '#recognition .section-label',
+      '>>recog.title':   '.recognition-title',
+      '>>contact.label': '#contact .section-label',
+      '>>contact.title': '.contact-title',
+      '>>contact.sub':   '.contact-sub',
+      '>>form.btn':      '#submitBtn',
+      '>>footer.copy':   '.footer-copy',
+      '>>team.r1': '#team .team-card:nth-child(1) .team-role',
+      '>>team.r2': '#team .team-card:nth-child(2) .team-role',
+      '>>team.r3': '#team .team-card:nth-child(3) .team-role',
+      '>>team.r4': '#team .team-card:nth-child(4) .team-role',
+      '>>stat1': '#about .about-stat:nth-child(1) .about-stat-label',
+      '>>stat2': '#about .about-stat:nth-child(2) .about-stat-label',
+      '>>stat3': '#about .about-stat:nth-child(3) .about-stat-label',
+    };
+
+    var currentLang = localStorage.getItem('cove-lang') || 'es';
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('cove-lang', lang);
+      var t = LANG[lang];
+
+      /* Update data-i18n elements */
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.textContent = t[key];
+      });
+
+      /* Update selector-mapped elements */
+      Object.keys(SEL_MAP).forEach(function(key) {
+        if (t[key] === undefined) return;
+        var sel = SEL_MAP[key];
+        var el = document.querySelector(sel);
+        if (!el) return;
+        /* Preserve SVG children — only replace text nodes */
+        var hasSvg = el.querySelector('svg');
+        if (hasSvg) {
+          Array.from(el.childNodes).forEach(function(node) {
+            if (node.nodeType === 3) node.textContent = t[key] + ' ';
+          });
+        } else {
+          el.textContent = t[key];
+        }
+      });
+
+      /* Special: contact info rows (have SVG icons) */
+      var infoRows = document.querySelectorAll('.contact-info-row');
+      if (infoRows[0]) {
+        var locNode = Array.from(infoRows[0].childNodes).find(function(n){return n.nodeType===3;});
+        if (locNode) locNode.textContent = ' ' + t['>>contact.loc'];
+      }
+      if (infoRows[3]) {
+        var respNode = Array.from(infoRows[3].childNodes).find(function(n){return n.nodeType===3;});
+        if (respNode) respNode.textContent = ' ' + t['>>contact.resp'];
+      }
+
+      /* Special: footer location (has SVG) */
+      var footLoc = document.querySelector('.footer-location');
+      if (footLoc) {
+        var ftNode = Array.from(footLoc.childNodes).find(function(n){return n.nodeType===3 && n.textContent.trim();});
+        if (ftNode) ftNode.textContent = ' ' + t['>>footer.loc'];
+      }
+
+      /* Form labels (uppercase) */
+      var lblMap = {
+        'c-name': t['>>form.name'], 'c-email': t['>>form.email'],
+        'c-plan': t['>>form.plan'], 'c-message': t['>>form.msg']
+      };
+      Object.keys(lblMap).forEach(function(id) {
+        var lbl = document.querySelector('label[for="' + id + '"]');
+        if (lbl) lbl.textContent = lblMap[id];
+      });
+
+      /* Form placeholders */
+      var placeholders = lang === 'en'
+        ? { 'c-name':'Your name','c-email':'you@company.com','c-message':'What do you need? Any details help...' }
+        : { 'c-name':'Tu nombre','c-email':'tu@empresa.com','c-message':'¿Qué necesitas? ¿Cuál es tu plazo? Cualquier detalle nos ayuda...' };
+      Object.keys(placeholders).forEach(function(id) {
+        var inp = document.getElementById(id);
+        if (inp) inp.placeholder = placeholders[id];
+      });
+
+      /* Select options */
+      var planSel = document.getElementById('c-plan');
+      if (planSel) {
+        var opts = lang === 'en'
+          ? ['Select a plan...','Basic — €299 + €29/mo','Professional — €499 + €49/mo','Full Access — €999 + €59/mo',"I'm not sure yet"]
+          : ['Selecciona un plan...','Básico — 299 € + 29 €/mes','Profesional — 499 € + 49 €/mes','Full Access — 999 € + 59 €/mes','Aún no lo sé'];
+        Array.from(planSel.options).forEach(function(opt, i) { if (opts[i]) opt.text = opts[i]; });
+      }
+
+      /* Lang button active states */
+      document.querySelectorAll('.lang-btn, .mobile-lang-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+
+      /* html lang attribute */
+      document.documentElement.lang = lang;
+    }
+
+    /* Init */
+    if (currentLang !== 'es') setLang(currentLang);
 
     function toggleFaq(el) {
       const item   = el.closest('.faq-item');
