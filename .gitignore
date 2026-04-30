@@ -4,3 +4,10 @@ CLAUDE-2.md
 
 # macOS
 .DS_Store
+.vercel
+
+# Dependencies
+node_modules/
+
+# Netlify
+.netlify/
