@@ -98,13 +98,13 @@
     /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0;
-      z-index: 100;
+      z-index: 201;
       padding: 0;
       transition: background 0.35s, border-color 0.35s;
       border-bottom: 1px solid transparent;
     }
     nav.light {
-      background: rgba(247,244,239,0.92);
+      background: rgba(247,244,239,0.95);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-color: var(--border);
@@ -123,18 +123,43 @@
     }
     nav.light .nav-logo { color: var(--black); }
     .nav-logo img { height: 30px; width: 30px; object-fit: contain; }
+
+    /* ── Sliding pill nav (desktop) ── */
     .nav-links {
-      display: flex; align-items: center; gap: 36px;
+      display: flex; align-items: center; gap: 0;
+      position: absolute; left: 50%; transform: translateX(-50%);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 100px;
+      padding: 5px;
       position: absolute; left: 50%; transform: translateX(-50%);
     }
+    nav.light .nav-links { border-color: var(--border); }
+    .nav-links li { position: relative; z-index: 1; list-style: none; }
     .nav-links a {
-      font-size: 14px; font-weight: 500;
-      color: rgba(255,255,255,0.65);
+      display: block;
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      padding: 7px 16px;
+      border-radius: 100px;
       transition: color 0.2s;
+      white-space: nowrap;
     }
     nav.light .nav-links a { color: var(--gray); }
     .nav-links a:hover { color: white; }
     nav.light .nav-links a:hover { color: var(--black); }
+    .nav-pill {
+      position: absolute;
+      top: 5px; height: calc(100% - 10px);
+      background: rgba(255,255,255,0.14);
+      border-radius: 100px;
+      pointer-events: none; z-index: 0;
+      opacity: 0;
+      transition: left 0.22s cubic-bezier(0.25,0.46,0.45,0.94),
+                  width 0.22s cubic-bezier(0.25,0.46,0.45,0.94),
+                  opacity 0.15s;
+    }
+    nav.light .nav-pill { background: rgba(0,0,0,0.06); }
+
     .nav-right { display: flex; align-items: center; gap: 20px; }
     .nav-social {
       font-size: 13px; font-weight: 500;
@@ -153,33 +178,55 @@
     }
     nav.light .btn-nav { background: var(--black); color: white; }
     .btn-nav:hover { opacity: 0.82; transform: translateY(-1px); }
+
+    /* ── Hamburger → X ── */
     .hamburger {
-      display: none; flex-direction: column; gap: 4px; padding: 6px; cursor: pointer;
+      display: none; flex-direction: column;
+      gap: 5px; padding: 10px; cursor: pointer;
+      position: relative; z-index: 202;
     }
     .hamburger span {
-      display: block; width: 20px; height: 1.5px;
+      display: block; width: 22px; height: 2px;
       background: white; border-radius: 2px;
-      transition: background 0.3s;
+      transform-origin: center;
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1),
+                  opacity 0.2s, background 0.3s;
     }
     nav.light .hamburger span { background: var(--black); }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-    /* Mobile menu */
+    /* ── Mobile menu ── */
     .mobile-menu {
-      display: none; position: fixed; inset: 0;
-      background: var(--bg); z-index: 99;
+      display: flex;
       flex-direction: column;
-      padding: 96px 32px 48px; gap: 0;
+      position: fixed; inset: 0;
+      background: #F7F4EF;
+      z-index: 200;
+      padding: 88px 32px 48px; gap: 0;
+      transform: translateX(100%);
+      visibility: hidden;
+      transition: transform 0.42s cubic-bezier(0.22,1,0.36,1),
+                  visibility 0s 0.42s;
     }
-    .mobile-menu.open { display: flex; }
+    .mobile-menu.open {
+      transform: translateX(0);
+      visibility: visible;
+      transition: transform 0.42s cubic-bezier(0.22,1,0.36,1),
+                  visibility 0s 0s;
+    }
     .mobile-menu a {
       font-size: 28px; font-weight: 700;
       color: var(--black); letter-spacing: -0.03em;
-      padding: 14px 0; border-bottom: 1px solid var(--border);
+      padding: 16px 0; border-bottom: 1px solid var(--border);
+      min-height: 56px; display: flex; align-items: center;
     }
     .mobile-cta {
       margin-top: 32px; font-size: 16px; font-weight: 600;
       background: var(--black); color: white;
-      padding: 14px 24px; border-radius: 10px; text-align: center;
+      padding: 16px 24px; border-radius: 10px; text-align: center;
+      min-height: 52px; display: flex; align-items: center; justify-content: center;
     }
 
     /* ── HERO ── */
@@ -924,14 +971,12 @@
   <canvas id="shader-bg" aria-hidden="true"></canvas>
 
   <!-- Mobile Menu -->
-  <div class="mobile-menu" id="mobileMenu">
-    <button onclick="toggleMenu()" style="position:absolute;top:20px;right:20px;padding:8px;" aria-label="Cerrar menú">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f0f0f" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <a href="#works" onclick="toggleMenu()">Trabajo</a>
     <a href="#process" onclick="toggleMenu()">Proceso</a>
     <a href="#pricing" onclick="toggleMenu()">Precios</a>
     <a href="#team" onclick="toggleMenu()">Equipo</a>
+    <a href="#about" onclick="toggleMenu()">Nosotros</a>
     <a href="#contact" onclick="toggleMenu()" class="mobile-cta">Empezar un proyecto</a>
   </div>
 
@@ -942,7 +987,8 @@
         <img src="brand_assets/dummy-removebg-preview.png" alt="Cove Studio" />
         <span>Cove Studio</span>
       </a>
-      <ul class="nav-links">
+      <ul class="nav-links" id="navLinks">
+        <div class="nav-pill" id="navPill" aria-hidden="true"></div>
         <li><a href="#works">Trabajo</a></li>
         <li><a href="#process">Proceso</a></li>
         <li><a href="#pricing">Precios</a></li>
@@ -1399,9 +1445,29 @@
       const menu = document.getElementById('mobileMenu');
       const btn  = document.getElementById('hamburgerBtn');
       const open = menu.classList.toggle('open');
+      btn.classList.toggle('open', open);
       btn.setAttribute('aria-expanded', open);
+      menu.setAttribute('aria-hidden', !open);
       document.body.style.overflow = open ? 'hidden' : '';
     }
+
+    /* ── Sliding pill nav hover effect ── */
+    (function () {
+      const ul   = document.getElementById('navLinks');
+      const pill = document.getElementById('navPill');
+      if (!ul || !pill) return;
+      const items = ul.querySelectorAll('li');
+      items.forEach(function (li) {
+        li.addEventListener('mouseenter', function () {
+          pill.style.left    = li.offsetLeft + 'px';
+          pill.style.width   = li.offsetWidth + 'px';
+          pill.style.opacity = '1';
+        });
+      });
+      ul.addEventListener('mouseleave', function () {
+        pill.style.opacity = '0';
+      });
+    })();
 
     function toggleFaq(el) {
       const item   = el.closest('.faq-item');
