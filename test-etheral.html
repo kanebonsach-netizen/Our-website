@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Etheral Shadow Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: white; }
+    
+    /* Background layer */
+    #etheral-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    /* Content */
+    .content {
+      position: relative;
+      z-index: 1;
+      padding: 60px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 { font-size: 48px; margin: 20px 0; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+    p { color: #fff; line-height: 1.6; margin: 10px 0; text-shadow: 0 1px 3px rgba(0,0,0,0.2); font-size: 16px; }
+    
+    section { margin: 100px 0; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 12px; backdrop-filter: blur(10px); }
+  </style>
+</head>
+<body>
+  <!-- Etheral Shadow Background -->
+  <svg id="etheral-bg">
+    <defs>
+      <filter id="etheral-filter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.002, 0.003" numOctaves="3" seed="1" />
+        <feDisplacementMap in="SourceGraphic" scale="80" />
+        <feColorMatrix id="etheral-hue" type="hueRotate" values="180" />
+        <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
+      </filter>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#grad)" filter="url(#etheral-filter)" />
+    <defs>
+      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color: rgb(100, 100, 150); stop-opacity: 0.3;" />
+        <stop offset="50%" style="stop-color: rgb(80, 120, 150); stop-opacity: 0.25;" />
+        <stop offset="100%" style="stop-color: rgb(120, 100, 150); stop-opacity: 0.3;" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="content">
+    <h1>Etheral Shadow Background</h1>
+    <p>If you see animated shifting shadows/colors behind this text, the effect is working!</p>
+    
+    <section>
+      <h2 style="color: #fff;">Section 1</h2>
+      <p>The background should have a smooth, continuous hue rotation animation.</p>
+    </section>
+    
+    <section>
+      <h2 style="color: #fff;">Section 2</h2>
+      <p>You should see purple/blue tones shifting smoothly.</p>
+    </section>
+    
+    <section>
+      <h2 style="color: #fff;">Section 3</h2>
+      <p>The distortion creates organic, wave-like patterns.</p>
+    </section>
+  </div>
+
+  <script>
+    const hueElement = document.getElementById('etheral-hue');
+    let hueValue = 180;
+    
+    function animate() {
+      hueValue += 1;
+      if (hueValue > 540) hueValue -= 360;
+      hueElement.setAttribute('values', String(hueValue));
+      requestAnimationFrame(animate);
+    }
+    
+    animate();
+    console.log('Etheral animation started');
+  </script>
+</body>
+</html>
