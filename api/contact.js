@@ -2,6 +2,36 @@ const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Rate limiting: 5 requests per hour per IP
+const requestTimestamps = new Map();
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60 * 60 * 1000;
+
+function getClientIp(req) {
+  return (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+}
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const key = `ip:${ip}`;
+
+  if (!requestTimestamps.has(key)) {
+    requestTimestamps.set(key, []);
+  }
+
+  const timestamps = requestTimestamps.get(key);
+  const recentRequests = timestamps.filter(t => now - t < RATE_WINDOW_MS);
+
+  requestTimestamps.set(key, recentRequests);
+
+  if (recentRequests.length >= RATE_LIMIT) {
+    return false;
+  }
+
+  recentRequests.push(now);
+  return true;
+}
+
 const PLAN_LABELS = {
   basic:        'Básico — €299 + €29/mes',
   professional: 'Profesional — €499 + €49/mes',
@@ -21,37 +51,71 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function sanitizeInput(str, maxLength = 500) {
+  return String(str)
+    .trim()
+    .slice(0, maxLength)
+    .replace(/[\x00-\x1F\x7F]/g, '');
+}
+
+function detectSpam(text) {
+  const spamPatterns = [
+    /\b(viagra|cialis|casino|bitcoin|crypto|forex|lottery)\b/gi,
+    /(http|https):\/\/[^\s]+/g,
+    /\b[a-z0-9]{20,}\b/gi,
+  ];
+  return spamPatterns.some(pattern => pattern.test(text));
+}
+
 module.exports = async function handler(req, res) {
+  // Security headers
   res.setHeader('Access-Control-Allow-Origin', 'https://covestudiomallorca.com');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Rate limiting
+  const clientIp = getClientIp(req);
+  if (!checkRateLimit(clientIp)) {
+    return res.status(429).json({ error: 'Demasiadas solicitudes. Por favor intenta más tarde.' });
+  }
 
   const { name, email, message, plan, _honey } = req.body || {};
 
   // Honeypot — bots fill this, real users never see it
   if (_honey) return res.status(200).json({ success: true });
 
-  // Validation
-  const n = (name    || '').trim();
-  const e = (email   || '').trim();
-  const m = (message || '').trim();
+  // Validation with sanitization
+  const n = sanitizeInput(name || '', 100);
+  const e = sanitizeInput(email || '', 254);
+  const m = sanitizeInput(message || '', 5000);
 
-  if (!n || !e || !m)       return res.status(400).json({ error: 'Por favor rellena todos los campos requeridos.' });
-  if (n.length < 2)         return res.status(400).json({ error: 'El nombre es demasiado corto.' });
-  if (!isValidEmail(e))     return res.status(400).json({ error: 'El email no es válido.' });
-  if (m.length < 10)        return res.status(400).json({ error: 'El mensaje es demasiado corto (mínimo 10 caracteres).' });
+  if (!n || !e || !m) return res.status(400).json({ error: 'Por favor rellena todos los campos requeridos.' });
+  if (n.length < 2) return res.status(400).json({ error: 'El nombre es demasiado corto.' });
+  if (n.length > 100) return res.status(400).json({ error: 'El nombre es demasiado largo.' });
+  if (!isValidEmail(e)) return res.status(400).json({ error: 'El email no es válido.' });
+  if (m.length < 10) return res.status(400).json({ error: 'El mensaje es demasiado corto (mínimo 10 caracteres).' });
+  if (m.length > 5000) return res.status(400).json({ error: 'El mensaje es demasiado largo.' });
+
+  // Spam detection
+  if (detectSpam(m)) {
+    return res.status(400).json({ error: 'El mensaje contiene contenido no permitido.' });
+  }
 
   const planLabel = PLAN_LABELS[plan] || 'No especificado';
-  const msgHtml   = escapeHtml(m).replace(/\n/g, '<br>');
+  const msgHtml = escapeHtml(m).replace(/\n/g, '<br>');
 
   try {
     // Notification to Cove Studio
     await resend.emails.send({
-      from:    'Cove Studio Contact <hola@covestudiomallorca.com>',
-      to:      ['infocovestudio1@gmail.com'],
+      from: 'Cove Studio Contact <hola@covestudiomallorca.com>',
+      to: ['infocovestudio1@gmail.com'],
       replyTo: e,
       subject: `Nuevo contacto: ${n}`,
       html: `
@@ -73,8 +137,8 @@ module.exports = async function handler(req, res) {
 
     // Auto-reply to the visitor
     await resend.emails.send({
-      from:    'Cove Studio <hola@covestudiomallorca.com>',
-      to:      [e],
+      from: 'Cove Studio <hola@covestudiomallorca.com>',
+      to: [e],
       subject: `Hemos recibido tu mensaje, ${n} — Cove Studio`,
       html: `
         <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#fff;">
@@ -85,6 +149,9 @@ module.exports = async function handler(req, res) {
           <div style="margin-top:32px;padding-top:24px;border-top:1px solid #e2ddd7;">
             <p style="margin:0;font-size:14px;font-weight:700;color:#1B2B45;">El equipo de Cove Studio</p>
             <p style="margin:4px 0 0;font-size:13px;color:#a8a49e;">Mallorca, España · hola@covestudiomallorca.com</p>
+            <p style="margin:12px 0 0;font-size:12px;color:#a8a49e;line-height:1.5;">
+              Tus datos se utilizan únicamente para responder a tu consulta y se retienen por 12 meses.
+            </p>
           </div>
         </div>
       `,
