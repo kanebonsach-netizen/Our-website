@@ -97,53 +97,25 @@
 </head>
 <body>
 
-  <!-- WebGL shader background (disabled for performance) -->
-  <!-- <canvas id="shader-bg" aria-hidden="true"></canvas> -->
-
-  <!-- Etheral Shadow Background Canvas (disabled for performance)-->
-  <!-- <canvas id="etheral-canvas" aria-hidden="true" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"></canvas> -->
-
-  <!-- Mobile Menu -->
-  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <a href="#works" onclick="toggleMenu()" data-i18n="nav.work">Trabajo</a>
-    <a href="#process" onclick="toggleMenu()" data-i18n="nav.process">Proceso</a>
-    <a href="#pricing" onclick="toggleMenu()" data-i18n="nav.pricing">Precios</a>
-    <a href="#team" onclick="toggleMenu()" data-i18n="nav.team">Equipo</a>
-    <a href="#about" onclick="toggleMenu()" data-i18n="nav.about">Nosotros</a>
-    <a href="#contact" onclick="toggleMenu()" class="mobile-cta" data-i18n="nav.cta.long">Empezar un proyecto</a>
-    <div class="mobile-lang">
-      <button class="mobile-lang-btn active" data-lang="es" onclick="setLang('es')">ES</button>
-      <button class="mobile-lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-    </div>
-  </div>
-
-  <!-- Nav -->
-  <nav id="navbar">
-    <div class="container nav-inner">
-      <a href="#" class="nav-logo">
-        <img src="brand_assets/dummy-removebg-preview.png" alt="Cove Studio" />
-        <span>Cove Studio</span>
-      </a>
-      <ul class="nav-links" id="navLinks">
-        <div class="nav-pill" id="navPill" aria-hidden="true"></div>
-        <li><a href="#works" data-i18n="nav.work">Trabajo</a></li>
-        <li><a href="#process" data-i18n="nav.process">Proceso</a></li>
-        <li><a href="#pricing" data-i18n="nav.pricing">Precios</a></li>
-        <li><a href="#team" data-i18n="nav.team">Equipo</a></li>
-        <li><a href="#about" data-i18n="nav.about">Nosotros</a></li>
-      </ul>
-      <div class="nav-right">
-        <a href="https://instagram.com" class="nav-social" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://linkedin.com" class="nav-social" target="_blank" rel="noopener">LinkedIn</a>
-        <div class="lang-toggle" aria-label="Language">
-          <button class="lang-btn active" data-lang="es" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-        </div>
-        <a href="#contact" class="btn-nav" data-i18n="nav.cta">Empezar proyecto</a>
+  <!-- Animated Navbar -->
+  <nav id="navbar" class="animated-nav expanded">
+    <div class="nav-expanded">
+      <div class="nav-icon">☰</div>
+      <div class="nav-items">
+        <a href="#works" data-i18n="nav.work">Trabajo</a>
+        <a href="#process" data-i18n="nav.process">Proceso</a>
+        <a href="#pricing" data-i18n="nav.pricing">Precios</a>
+        <a href="#team" data-i18n="nav.team">Equipo</a>
+        <a href="#about" data-i18n="nav.about">Nosotros</a>
+        <a href="#contact" data-i18n="nav.contact">Contacto</a>
       </div>
-      <button class="hamburger" onclick="toggleMenu()" id="hamburgerBtn" aria-label="Abrir menú">
-        <span></span><span></span><span></span>
-      </button>
+      <div class="nav-lang-toggle">
+        <button class="nav-lang-btn active" data-lang="es" onclick="setLang('es')">ES</button>
+        <button class="nav-lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+    <div class="nav-collapsed">
+      <div class="nav-icon">☰</div>
     </div>
   </nav>
 
@@ -554,17 +526,7 @@
           <img src="brand_assets/dummy-removebg-preview.png" alt="Cove Studio" />
           <span>Cove Studio</span>
         </a>
-        <nav class="footer-nav" aria-label="Navegación del pie de página">
-          <a href="#works">Trabajo</a>
-          <a href="#process">Proceso</a>
-          <a href="#pricing">Precios</a>
-          <a href="#team">Equipo</a>
-          <a href="#about">Nosotros</a>
-          <a href="#contact">Contacto</a>
-        </nav>
-        <div class="footer-socials">
-          <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+<div class="footer-socials">
           <a href="mailto:infocovestudio1@gmail.com">Email</a>
         </div>
       </div>
@@ -581,61 +543,37 @@
   <script>
     const nav = document.getElementById('navbar');
     let lastScrollY = 0;
-    let isNavVisible = true;
+    let isVisible = true;
+    let scrollPositionOnHide = 0;
+    let rafId = null;
+    const EXPAND_SCROLL_THRESHOLD = 80;
 
-    window.addEventListener('scroll', () => {
+    const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      const previous = lastScrollY;
 
-      // Toggle light class based on position
-      nav.classList.toggle('light', currentScrollY > 80);
-
-      // Hide/show navbar based on scroll direction
-      if (currentScrollY > lastScrollY && currentScrollY > 80) {
-        // Scrolling down
-        if (isNavVisible) {
-          nav.style.transform = 'translateY(-100%)';
-          nav.style.transition = 'transform 0.3s ease-in-out';
-          isNavVisible = false;
-        }
-      } else {
-        // Scrolling up
-        if (!isNavVisible) {
-          nav.style.transform = 'translateY(0)';
-          nav.style.transition = 'transform 0.3s ease-in-out';
-          isNavVisible = true;
-        }
+      if (isVisible && currentScrollY > previous && currentScrollY > 150) {
+        nav.style.transform = 'translateY(-100%) translateZ(0)';
+        nav.style.opacity = '0';
+        nav.style.pointerEvents = 'none';
+        isVisible = false;
+        scrollPositionOnHide = currentScrollY;
+      } else if (!isVisible && currentScrollY < previous && (scrollPositionOnHide - currentScrollY > EXPAND_SCROLL_THRESHOLD)) {
+        nav.style.transform = 'translateX(-50%) translateZ(0)';
+        nav.style.opacity = '1';
+        nav.style.pointerEvents = 'auto';
+        isVisible = true;
       }
 
       lastScrollY = currentScrollY;
+      rafId = null;
+    };
+
+    window.addEventListener('scroll', () => {
+      if (rafId === null) {
+        rafId = requestAnimationFrame(handleScroll);
+      }
     }, { passive: true });
-
-    function toggleMenu() {
-      const menu = document.getElementById('mobileMenu');
-      const btn  = document.getElementById('hamburgerBtn');
-      const open = menu.classList.toggle('open');
-      btn.classList.toggle('open', open);
-      btn.setAttribute('aria-expanded', open);
-      menu.setAttribute('aria-hidden', !open);
-      document.body.style.overflow = open ? 'hidden' : '';
-    }
-
-    /* ── Sliding pill nav hover effect ── */
-    (function () {
-      const ul   = document.getElementById('navLinks');
-      const pill = document.getElementById('navPill');
-      if (!ul || !pill) return;
-      const items = ul.querySelectorAll('li');
-      items.forEach(function (li) {
-        li.addEventListener('mouseenter', function () {
-          pill.style.left    = li.offsetLeft + 'px';
-          pill.style.width   = li.offsetWidth + 'px';
-          pill.style.opacity = '1';
-        });
-      });
-      ul.addEventListener('mouseleave', function () {
-        pill.style.opacity = '0';
-      });
-    })();
 
     /* ── Language switcher ── */
     var LANG = {
@@ -819,7 +757,7 @@
       }
 
       /* Lang button active states */
-      document.querySelectorAll('.lang-btn, .mobile-lang-btn').forEach(function(btn) {
+      document.querySelectorAll('.lang-btn, .mobile-lang-btn, .nav-lang-btn').forEach(function(btn) {
         btn.classList.toggle('active', btn.dataset.lang === lang);
       });
 
@@ -907,186 +845,6 @@
       }
     }
 
-    /* ── WebGL shader background ── */
-    (function () {
-      var canvas = document.getElementById('shader-bg');
-      var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      if (!gl) { document.body.style.background = '#F7F4EF'; return; }
-
-      function resize() {
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width  = window.innerWidth  * dpr;
-        canvas.height = window.innerHeight * dpr;
-        gl.viewport(0, 0, canvas.width, canvas.height);
-      }
-      resize();
-      window.addEventListener('resize', resize, { passive: true });
-
-      /* Flat vertex shader — all animation in fragment */
-      var vsrc = [
-        'attribute vec2 aPos;',
-        'attribute vec2 aUv;',
-        'varying vec2 vUv;',
-        'void main(){vUv=aUv;gl_Position=vec4(aPos,0.0,1.0);}'
-      ].join('\n');
-
-      /* Fragment shader — slow mesh-gradient with brand palette */
-      var fsrc = [
-        'precision mediump float;',
-        'uniform float time;',
-        'uniform vec3 c1;',  /* warm ivory  #F7F4EF */
-        'uniform vec3 c2;',  /* teal wash   #C8E8E8 */
-        'uniform vec3 c3;',  /* navy tint   #D6DDE8 */
-        'varying vec2 vUv;',
-        'void main(){',
-        '  vec2 uv=vUv;',
-        /* Three overlapping sine waves — large, slow, different angles */
-        '  float w1=sin(uv.x*3.8+time*0.22)*cos(uv.y*2.9+time*0.16);',
-        '  float w2=sin(uv.x*6.5-time*0.28+1.4)*cos(uv.y*4.7+time*0.20+0.9);',
-        '  float w3=sin((uv.x*0.7+uv.y)*4.2+time*0.18)*cos((uv.x-uv.y*0.5)*3.1-time*0.14);',
-        '  float t=clamp((w1+w2*0.55+w3*0.38)*0.35+0.5,0.0,1.0);',
-        /* Second blend axis for a three-colour effect */
-        '  float t2=clamp((w2+w3*0.6-w1*0.3)*0.32+0.5,0.0,1.0);',
-        '  vec3 col=mix(c1,c2,t);',
-        '  col=mix(col,c3,t2*0.45);',
-        /* Subtle centre brightening */
-        '  float d=1.0-length(uv-0.5)*0.85;',
-        '  col+=c1*clamp(d,0.0,1.0)*0.08;',
-        '  gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);',
-        '}'
-      ].join('\n');
-
-      function mkShader(type, src) {
-        var s = gl.createShader(type);
-        gl.shaderSource(s, src); gl.compileShader(s); return s;
-      }
-      var prog = gl.createProgram();
-      gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,   vsrc));
-      gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, fsrc));
-      gl.linkProgram(prog); gl.useProgram(prog);
-
-      /* Full-screen quad (two triangles) */
-      var pos = new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]);
-      var uvs = new Float32Array([ 0, 0, 1, 0,  0,1,  0,1, 1, 0, 1,1]);
-
-      var pb = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, pb);
-      gl.bufferData(gl.ARRAY_BUFFER, pos, gl.STATIC_DRAW);
-      var aP = gl.getAttribLocation(prog, 'aPos');
-      gl.enableVertexAttribArray(aP);
-      gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
-
-      var ub = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, ub);
-      gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
-      var aU = gl.getAttribLocation(prog, 'aUv');
-      gl.enableVertexAttribArray(aU);
-      gl.vertexAttribPointer(aU, 2, gl.FLOAT, false, 0, 0);
-
-      var uTime = gl.getUniformLocation(prog, 'time');
-      var uC1   = gl.getUniformLocation(prog, 'c1');
-      var uC2   = gl.getUniformLocation(prog, 'c2');
-      var uC3   = gl.getUniformLocation(prog, 'c3');
-
-      /* Brand palette */
-      gl.uniform3f(uC1, 0.969, 0.957, 0.937); /* #F7F4EF warm ivory */
-      gl.uniform3f(uC2, 0.784, 0.910, 0.910); /* #C8E8E8 light teal  */
-      gl.uniform3f(uC3, 0.839, 0.867, 0.910); /* #D6DDE8 navy tint   */
-
-      var t0 = performance.now();
-      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      /* Draw static frame when motion is reduced */
-      gl.uniform1f(uTime, 12.0); /* mid-cycle snapshot */
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-      /* Animation disabled for performance
-      if (!reduced) {
-        function frame() {
-          gl.uniform1f(uTime, (performance.now() - t0) / 1000);
-          gl.drawArrays(gl.TRIANGLES, 0, 6);
-          requestAnimationFrame(frame);
-        }
-        requestAnimationFrame(frame);
-      } */
-    })();
-
-    /* ── Etheral Shadow Canvas Background ── */
-    (function() {
-      const canvas = document.getElementById('etheral-canvas');
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-
-      let time = 0;
-      let animationId = null;
-
-      function perlinNoise(x, y, t) {
-        return Math.sin(x * 0.002 + t * 0.3) * Math.cos(y * 0.003 + t * 0.2) * Math.sin((x + y) * 0.001 + t * 0.15);
-      }
-
-      function drawGradientBlob(x, y, size, color1, color2, alpha) {
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
-        gradient.addColorStop(0, color1);
-        gradient.addColorStop(0.5, color2);
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      function animate() {
-        // Fade previous frame slightly for motion trail
-        ctx.fillStyle = 'rgba(247, 244, 239, 0.98)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        time += 0.002;
-
-        // Large slow-moving accent blobs with brand colors
-        const blob1X = canvas.width * 0.25 + Math.sin(time * 0.3) * 200;
-        const blob1Y = canvas.height * 0.4 + Math.cos(time * 0.25) * 150;
-        drawGradientBlob(blob1X, blob1Y, 500, 'rgba(46, 143, 143, 0.08)', 'rgba(61, 170, 170, 0.04)', 0.08);
-
-        const blob2X = canvas.width * 0.75 + Math.sin(time * 0.2 + Math.PI) * 180;
-        const blob2Y = canvas.height * 0.6 + Math.cos(time * 0.18 + Math.PI) * 140;
-        drawGradientBlob(blob2X, blob2Y, 450, 'rgba(27, 43, 69, 0.06)', 'rgba(107, 107, 107, 0.03)', 0.06);
-
-        const blob3X = canvas.width * 0.5 + Math.sin(time * 0.15 + Math.PI * 0.5) * 220;
-        const blob3Y = canvas.height * 0.3 + Math.cos(time * 0.12 + Math.PI * 0.5) * 180;
-        drawGradientBlob(blob3X, blob3Y, 550, 'rgba(168, 164, 158, 0.05)', 'rgba(200, 200, 200, 0.02)', 0.05);
-
-        // Fine grain texture overlay
-        for (let i = 0; i < 15; i++) {
-          const gx = Math.random() * canvas.width;
-          const gy = Math.random() * canvas.height;
-          const gsize = Math.random() * 300 + 100;
-          const opacity = Math.sin(time + i) * 0.003 + 0.002;
-          ctx.fillStyle = `rgba(100, 100, 100, ${opacity})`;
-          ctx.fillRect(gx, gy, gsize, gsize);
-        }
-
-        animationId = requestAnimationFrame(animate);
-      }
-
-      /* Animation disabled for performance
-      if (!reduced) {
-        animate();
-      } */
-
-      window.addEventListener('beforeunload', () => {
-        if (animationId) cancelAnimationFrame(animationId);
-      });
-    })();
   </script>
 </body>
 </html>
